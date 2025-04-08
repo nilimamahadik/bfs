@@ -1,0 +1,463 @@
+import React, { useEffect, useState } from "react";
+import {
+    Button,
+    Modal,
+    Form,
+    Input,
+    Table,
+    Typography,
+    Space,
+    Card,
+    Upload,
+    Popconfirm,
+    message
+} from "antd";
+import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
+import { PlusOutlined, UploadOutlined } from "@ant-design/icons";
+import Papa from "papaparse";
+import axios from "axios";
+import { useNavigate, useParams } from 'react-router-dom';
+import { DataTable } from "../commonfunction/Datatable";
+import { getIndianTimestamp } from "../commonfunction/formatDate";
+import { MdArrowBack } from "react-icons/md";
+
+const BASEURL = "/api"
+
+const WarehouseMaster = () => {
+    const navigate = useNavigate();
+    const { groupId } = useParams()
+    // console.log(groupId);
+    const [open, setOpen] = useState(false);
+    const [bulkUploadOpen, setBulkUploadOpen] = useState(false);
+    const [fileList, setFileList] = useState([]);
+    // const [WarehouseList, setWarehouses] = useState([]);
+
+    const [products, setWarehouses] = useState([]);
+    //console.log(products);
+
+
+    const [currentWarehouse, setCurrentWarehouse] = useState(null); // Stores Selected Warehouse for Editing
+    const [editOpen, setEditOpen] = useState(false); // Controls Edit Modal State
+    const [value, setValue] = useState({})
+    // console.log(value.id);
+    const [editForm] = Form.useForm(); // Antd Form Hook
+    const [form] = Form.useForm(); // Antd Form Hook
+    const userId = value.id
+
+    const handleOpen = () => {
+        form.resetFields();
+        setOpen(true);
+    };
+
+    useEffect(() => {
+        const savedInfo = localStorage.getItem("info");
+        if (savedInfo) {
+            const parsedInfo = JSON.parse(savedInfo);
+            setValue(parsedInfo);
+        }
+        else {
+            navigate("/");
+        }
+
+    }, []);
+
+    const handleEditOpen = (product) => {
+        //console.log(product);
+
+        //// // console.log("Editing Warehouse:", product);
+        setCurrentWarehouse(product);
+        editForm.setFieldsValue(product); // Pre-fill form with selected product details
+        setEditOpen(true);
+    };
+
+    const handleClose = () => setOpen(false);
+    // Add Warehouse
+    const addWarehouse = () => {
+        form.validateFields().then(async (values) => {
+            // // console.log("values", values);
+            // // console.log("User ID:", value.id);
+            const payload = { ...values, groupId };
+            try {
+                const response = await axios.post(`${BASEURL}/Warehousemaster`, payload);
+                // setWarehouses([...products, response.data.product]); // Update UI
+                fetchWarehouses();
+                message.success({
+                    content: response.data.message,
+                    duration: 2, // Time before it disappears (in seconds)
+                    style: {
+                        marginTop: "25vh", // Moves it to center vertically
+                        textAlign: "center", // Ensures text is centered
+                        // Moves it to center horizontally
+                    }
+                });
+                handleClose();
+            } catch (error) {
+                // // console.error("Error adding product:", error);
+                alert("Failed to add Warehouse !");
+            }
+        });
+    };
+
+
+    const fetchWarehouses = async () => {
+        try {
+            const response = await axios.get(`${BASEURL}/getwarehouse/${groupId}`);
+            setWarehouses(response?.data?.products);
+        } catch (error) {
+            // // console.error("Error fetching products:", error);
+        }
+    };
+
+
+    const editWarehouse = async () => {
+        try {
+            const values = await editForm.validateFields(); // Validate form inputs
+            const response = await axios.patch(`${BASEURL}/warehouseupdate/${currentWarehouse._id}`, values);
+
+            // Update product in the UI
+            const updatedWarehouses = products.map((p) =>
+                p._id === currentWarehouse._id ? { ...p, ...values } : p
+            );
+            setWarehouses(updatedWarehouses);
+            message.success({
+                content: response.data.message,
+                duration: 2, // Time before it disappears (in seconds)
+                style: {
+                    marginTop: "25vh", // Moves it to center vertically
+                    textAlign: "center", // Ensures text is centered
+                    // Moves it to center horizontally
+                }
+            });
+            // message.success(response.data.message);
+            setEditOpen(false); // Close modal after successful edit
+        } catch (error) {
+            // // console.error("Error updating product:", error);
+            message.error("Failed to update product!");
+        }
+    };
+
+
+    useEffect(() => {
+        fetchWarehouses();
+    }, []);
+
+
+    const deleteWarehouse = async (id) => {
+        //// // console.log("Deleting Warehouse:", id);
+
+        try {
+            await axios.delete(`${BASEURL}/deletewarehouse/${id}`);
+            setWarehouses(products.filter((product) => product._id !== id));
+
+            message.success({
+                content: "Warehouse deleted successfully!",
+                duration: 2, // Time before it disappears (in seconds)
+                style: {
+                    marginTop: "25vh", // Moves it to center vertically
+                    textAlign: "center", // Ensures text is centered
+                    // Moves it to center horizontally
+                }
+            });
+
+        } catch (error) {
+            // // console.error("Error deleting product:", error);
+            message.error("Failed to delete Warehouse!");
+        }
+    };
+
+
+    const handleUpload = async () => {
+        if (fileList.length === 0) {
+            message.error("Please select a CSV file to upload.");
+            return;
+        }
+
+        const file = fileList[0];
+
+        Papa.parse(file.originFileObj, {
+            complete: async (result) => {
+                let records = result.data.slice(1).map(row => ({
+                    name: row[0]?.trim() || "",
+                    place: row[1]?.trim() || "",
+                    capacity: row[2]?.trim() || "",
+                    manager: row[3]?.trim() || "",
+                    mobileNo: row[4]?.trim() || "",
+                    group_id: value?.id, // ✅ Attach the groupId
+                }));
+
+                // ✅ Filter out invalid entries (missing required fields)
+                records = records.filter(record => record.name && record.place && record.capacity && record.manager && record.mobileNo && record.group_id);
+
+                if (records.length === 0) {
+                    message.error("No valid records found in the CSV file.");
+                    return;
+                }
+
+                try {
+                    const response = await axios.post(`${BASEURL}/uploadwarehouse`, { products: records });
+                    // console.log(response);
+
+                    message.success(response.data.message);
+                    setWarehouses([...products, ...records]);
+                    setBulkUploadOpen(false);
+                    setFileList([]);
+                } catch (error) {
+                    // console.error("Error uploading CSV:", error);
+                    message.error("Failed to upload CSV.");
+                }
+            },
+            header: false
+        });
+    };
+
+    // Table Columns
+    const columns = [
+        { field: "id", headerName: "Sr. No.", minWidth: 30, flex: 0.5 },
+        { field: "name", headerName: "Name of Warehouse", minWidth: 150, flex: 1 },
+        { field: "place", headerName: "Place", minWidth: 60, flex: 0.5 },
+        { field: "capacity", headerName: "Capacity", minWidth: 60, flex: 0.5 },
+        { field: "manager", headerName: "Name of Manager ", minWidth: 80, flex: 1 },
+        { field: "mobileNo", headerName: "Mobile No.", minWidth: 40, flex: 1 },
+        { field: "createdAt", headerName: "Created At", minWidth: 40, flex: 1 },
+        {
+            field: "actions",
+            headerName: "Actions",
+            sortable: false,
+            flex: 0.4,
+            renderCell: (params) => {
+                // console.log(params); // Logs params for debugging
+
+                return (
+                    <Space style={{ padding: "7px" }}>
+                        {/* ✅ Edit Button */}
+                        <EditOutlined />
+                        {/* <Button
+                            icon={<EditOutlined  onClick={() => handleEditOpen(params.row._id)}/>}
+                            onClick={() => handleEditOpen(params.row._id)}
+                            style={{
+                                backgroundColor: "#77B254",
+                                color: "white",
+                                borderColor: "green",
+                            }}
+                        >
+                            Edit
+                        </Button> */}
+
+                        {/* ✅ Delete Button with Confirmation */}
+                        <Popconfirm
+                            title="Are you sure you want to delete this Warehouse?"
+                            onConfirm={() => deleteWarehouse(params.row._id._id)}
+                            okText="Yes"
+                            cancelText="No"
+                        >
+                            <DeleteOutlined />
+                            {/* <Button
+                                danger
+                                icon={<DeleteOutlined />}
+                                style={{
+                                    backgroundColor: "#C63D2F",
+                                    color: "white",
+                                    borderColor: "red",
+                                }}
+                            >
+                                Delete
+                            </Button> */}
+                        </Popconfirm>
+                    </Space>
+                );
+            },
+        },
+    ];
+
+
+
+
+
+    const rows = products?.map((item, index) => {
+        return {
+            id: index + 1,
+            name: item.name || "NA",
+            place: item.place || "NA",
+            capacity: item.capacity || "NA",
+            manager: item.manager || "NA",
+            mobileNo: item.mobileNo || "NA",
+            _id: item, // ✅ Include _id for delete action
+            createdAt: getIndianTimestamp(item.createdAt) || "NA",
+        };
+    }) || [];
+
+
+    return (
+        <div >
+
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px", marginTop: "5px" }}>
+                <Typography.Title
+                    level={3}
+                    style={{
+                        color: "black",
+                        fontSize: "20px",
+                        margin: 0,
+                        marginLeft: "5px",
+                        fontWeight: "400"
+                    }}
+                >
+                    <MdArrowBack />    Warehouse Master
+                </Typography.Title>
+                <div style={{ marginRight: "30px" }}>
+                    <Button type="default" icon={<PlusOutlined />} onClick={() => setOpen(true)} style={{ marginRight: "10px" }}>
+                        Add Warehouse
+                    </Button>
+
+                    <Button type="default" icon={<UploadOutlined />} onClick={() => setBulkUploadOpen(true)}>
+                        Bulk Upload
+                    </Button>
+                </div>
+            </div>
+
+
+
+            <Modal
+                title="📤 Bulk Upload Warehouses"
+                open={bulkUploadOpen}
+                onCancel={() => setBulkUploadOpen(false)}
+                onOk={handleUpload}
+                okText="Upload"
+                cancelText="Cancel"
+                centered
+                style={{ top: 30 }}
+            >
+                <p>Please upload a CSV file with the following format:</p>
+                <p><b>Name, Place, capacity,Name of Manager, Mobile No</b></p>
+
+                <Upload
+                    beforeUpload={() => false}
+                    onChange={({ fileList }) => setFileList(fileList)}
+                    fileList={fileList}
+                    accept=".csv"
+                >
+                    <Button icon={<UploadOutlined />}>Select CSV File</Button>
+                </Upload>
+            </Modal>
+            {/* {products.length > 0 && (
+                <Card title="📜 Warehouse List" style={{ marginTop: 20 }}>
+                    <Table dataSource={products} columns={columns} rowKey="name" pagination={false} />
+                </Card>
+            )} */}
+
+            {/* Warehouse Form Modal */}
+            <Modal
+                title=" Add a New Warehouse"
+                open={open}
+                onCancel={handleClose}
+                onOk={addWarehouse}
+                okText="Save"
+                cancelText="Cancel"
+                centered
+                style={{ top: 30 }}
+            >
+                <hr />
+                <Form form={form} layout="vertical">
+                    <Form.Item
+                        label="Name of Warehouse"
+                        name="name"
+                        rules={[{ required: true, message: "Please enter Name of Warehouse" }]}
+                    >
+                        <Input placeholder="Enter Name of Warehouse" />
+                    </Form.Item>
+                    <Form.Item
+                        label="Address"
+                        name="place"
+                        rules={[{ required: true, message: "Please enter place" }]}
+                    >
+                        <Input placeholder="Enter place " />
+                    </Form.Item>
+
+                    <Form.Item
+                        label="Capacity (MT)"
+                        name="capacity"
+                        rules={[{ message: "Please enter capacity" }]}
+                    >
+                        <Input placeholder="Enter capacity" />
+                    </Form.Item>
+                    <Form.Item
+                        label="Name of Manager"
+                        name="manager"
+                        rules={[{ message: "Please enter Manager" }]}
+                    >
+                        <Input placeholder="Enter Manager" />
+                    </Form.Item>
+                    <Form.Item
+                        label="Mobile Number"
+                        name="mobileNo"
+                        rules={[{ message: "Please enter Mobile Number" }]}
+                    >
+                        <Input placeholder="Enter Mobile Number" />
+                    </Form.Item>
+                </Form>
+            </Modal>
+            <Modal
+                title="✏️ Edit Warehouse"
+                open={editOpen} // Ensure this is linked to editOpen state
+                onCancel={() => setEditOpen(false)} // Close modal when clicking outside
+                onOk={editWarehouse}
+                centered
+                style={{ top: 30 }}
+            >
+                <hr />
+                <Form form={editForm} layout="vertical">
+                    <Form.Item
+                        label="Name of Warehouse"
+                        name="name"
+                        rules={[{ required: true, message: "Please enter Name of Warehouse" }]}
+                    >
+                        <Input placeholder="Enter Name of Warehouse" />
+                    </Form.Item>
+                    <Form.Item
+                        label="Place"
+                        name="place"
+                        rules={[{ required: true, message: "Please enter place" }]}
+                    >
+                        <Input placeholder="Enter place " />
+                    </Form.Item>
+
+                    <Form.Item
+                        label="capacity"
+                        name="capacity"
+                        rules={[{ message: "Please enter capacity" }]}
+                    >
+                        <Input placeholder="Enter capacity" />
+                    </Form.Item>
+                    <Form.Item
+                        label="Name of Manager"
+                        name="manager"
+                        rules={[{ message: "Please enter Manager" }]}
+                    >
+                        <Input placeholder="Enter Manager" />
+                    </Form.Item>
+                    <Form.Item
+                        label="Mobile Number"
+                        name="mobileNo"
+                        rules={[{ message: "Please enter Mobile Number" }]}
+                    >
+                        <Input placeholder="Enter Mobile Number" />
+                    </Form.Item>
+                </Form>
+            </Modal>
+            {/* Warehouse List */}
+            {products.length > 0 && (
+                //// console.log(products),
+
+
+                <DataTable rows={rows} columns={columns} />
+
+
+
+
+            )}
+        </div>
+    );
+};
+
+export default WarehouseMaster;
+
+

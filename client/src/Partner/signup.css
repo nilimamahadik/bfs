@@ -1,0 +1,39 @@
+/* AdminLogin.css */
+
+/* Default background image for web */
+.background {
+    background-image: url("../image/new1.png");
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center center;
+    height: 110vh;
+    
+  }
+  
+  /* Media query for mobile devices */
+  @media (max-width: 768px) {
+    .background {
+      background-image: url("../image/ICE\ nologo.png");
+      background-size: cover;
+
+    }
+  }
+  
+  /* .background {
+    background-color: rgb(183, 200, 215);
+    text-align: center;
+  } */
+  
+  /* Admin.css */
+
+.custom-input {
+    height: 30px; /* Adjust the height as needed */
+    overflow: hidden; /* Prevent scrolling */
+    border: 1px solid white; /* Set white border */
+    border-radius: 10px; /* Adjust the border radius as needed */
+  }
+  
+  .custom-input input::placeholder {
+    color: white; /* Set white placeholder text color */
+  }
+  

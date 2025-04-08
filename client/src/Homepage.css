@@ -1,0 +1,119 @@
+body, html {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow-x: hidden; /* Prevent horizontal scrolling */
+}
+
+.outer {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    
+    background-color: #f5f5f5;
+    overflow: hidden; /* Prevent scrollbars inside the outer container */
+}
+
+
+
+.containers {
+    flex: 2; /* Take up equal space */
+    background-image: url('./image/new.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.image-overlay {
+    flex: 1; /* Take up equal space */
+    background-color: #f4f4f4;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    width: 30%;
+}
+
+.login-options {
+    text-align: center;
+    width: 100%;
+}
+
+.login-options button {
+    display: block;
+    width: 100%;
+    max-width: 300px;
+    padding: 15px;
+    margin: 10px auto;
+    font-size: 1rem;
+    color: white;
+    background-color: #007bff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.login-options button:hover {
+    background-color: #0056b3;
+}
+
+footer {
+    height: 50px;
+    background-color: #333;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1rem;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+}
+
+footer a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+footer a:hover {
+    text-decoration: underline;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .layout {
+        flex-direction: column; /* Stack containers vertically on smaller screens */
+        height: auto;
+    }
+
+    .containers, .image-overlay {
+        flex: none;
+        width: 100%;
+        height: auto;
+    }
+
+    .login-options button {
+        width: 90%;
+    }
+
+    footer {
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .login-options button {
+        font-size: 0.9rem;
+        padding: 10px;
+    }
+
+    footer {
+        font-size: 0.8rem;
+    }
+}
