@@ -258,7 +258,7 @@
 //         const sc = parseFloat(allValues.sc) || 0;      // Subtract this from sumof
 //         const hamali = parseFloat(allValues.hamali) || 0;  // Add this to result
 //         const finalTotal = (sumof - sc) - hamali;
-        
+
 //         modalForm.setFields([
 //             {
 //                 name: 'productDetails',
@@ -326,7 +326,7 @@
 //     };
 //     const handleTransportChange = (value) => {
 //         console.log(value);
-        
+
 //         const selected = transport.find((item) => item._id === value);
 //         setSelectedTransport(selected);
 
@@ -403,9 +403,9 @@
 //                                         {Array.isArray(transport) &&
 //                                             transport.map((item) => (
 //                                                 console.log(item),
-                                             
 
-                                                
+
+
 //                                                 <Select.Option key={item._id} value={item._id} label={item.from}>
 //                                                     {item.from}
 //                                                 </Select.Option>
@@ -1010,8 +1010,10 @@ const FormDataInfoUser = ({
 
         const get = axios.get(`${BASEURL}/getallusers/${params.id}`)
             .then((res) => {
-                setData(res.data.data);
+                // setData(res.data.data);
                 //  // //consoleog(res.data);
+                const filteredData = res.data.data.filter(user => !user.deleted);
+                setData(filteredData);
                 localStorage.setItem("count", JSON.stringify(res.data));
             })
             .catch((err) => {
@@ -1157,10 +1159,12 @@ const FormDataInfoUser = ({
     const fetchProducts = async () => {
         try {
             const response = await axios.get(`${BASEURL}/products/${params.id}`);
-            setProducts(response?.data?.products);
+            const activeProducts = response?.data?.products?.filter(product => product.active === true);
+            setProducts(activeProducts);
         } catch (error) {
         }
     };
+    
     useEffect(() => {
         fetchProducts();
     }, []);

@@ -10,7 +10,8 @@ import {
     Card,
     Upload,
     Popconfirm,
-    message
+    message,
+    Radio
 } from "antd";
 import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import { PlusOutlined, UploadOutlined } from "@ant-design/icons";
@@ -224,6 +225,24 @@ const ConsignorMaster = () => {
             flex: 0.5,
         },
         {
+            field: "active",
+            headerName: "Status",
+            sortable: false,
+            flex: 0.4,
+            renderCell: (params) => {
+                return (
+                    <div
+                        style={{
+                            color: params.value === "ACTIVE" ? "green" : "red", // Conditional text color
+
+                        }}
+                    >
+                        {params.value}
+                    </div>
+                );
+            },
+        },
+        {
             field: "actions",
             headerName: "Actions",
             sortable: false,
@@ -232,41 +251,17 @@ const ConsignorMaster = () => {
                 // console.log(params); // Logs params for debugging
 
                 return (
-                    <Space style={{padding: "7px"}}>
-                        {/* ✅ Edit Button */}
-                        <EditOutlined  onClick={() => handleEditOpen(params.row._id)}/>
-                        {/* <Button
+                    <Space style={{ padding: "7px" }}>
+                        <Button
+                            type="primary"
+                            style={{
+                                backgroundColor: "#AA2B1D", // Maroon background color
+                                borderColor: "#AA2B1D", // Match border color with background
+                                color: "white", // White icon color
+                            }}
                             icon={<EditOutlined />}
                             onClick={() => handleEditOpen(params.row._id)}
-                            style={{
-                                backgroundColor: "#77B254",
-                                color: "white",
-                                borderColor: "green",
-                            }}
-                        >
-                            Edit
-                        </Button> */}
-
-                        {/* ✅ Delete Button with Confirmation */}
-                        <Popconfirm
-                            title="Are you sure you want to delete this Consignor?"
-                            onConfirm={() => deleteConsignor(params.row._id._id)}
-                            okText="Yes"
-                            cancelText="No"
-                        >
-                            <DeleteOutlined />
-                            {/* <Button
-                                danger
-                                icon={<DeleteOutlined />}
-                                style={{
-                                    backgroundColor: "#C63D2F",
-                                    color: "white",
-                                    borderColor: "red",
-                                }}
-                            >
-                                Delete
-                            </Button> */}
-                        </Popconfirm>
+                        />
                     </Space>
                 );
             },
@@ -275,6 +270,10 @@ const ConsignorMaster = () => {
 
 
 
+
+    const findstatus = (status) => {
+        return status ? 'ACTIVE' : "INACTIVE"
+    }
 
 
     const rows = products?.map((item, index) => {
@@ -288,6 +287,8 @@ const ConsignorMaster = () => {
             mobileNo: item.mobileNo || "NA",
             createdDate: getIndianTimestamp(item.createdAt) || "NA",
             _id: item, // ✅ Include _id for delete action
+            active: findstatus(item.active) || "NA"
+
         };
     }) || [];
 
@@ -430,6 +431,16 @@ const ConsignorMaster = () => {
                         rules={[{ message: "Please enter Mobile Number" }]}
                     >
                         <Input placeholder="Enter Mobile Number" />
+                    </Form.Item>
+                    <Form.Item
+                        name='active'
+                        label="Status"
+                        rules={[{ required: true, message: 'Please select a status!' }]}
+                    >
+                        <Radio.Group>
+                            <Radio value={true}>Active</Radio>
+                            <Radio value={false}>Inactive</Radio>
+                        </Radio.Group>
                     </Form.Item>
                 </Form>
             </Modal>

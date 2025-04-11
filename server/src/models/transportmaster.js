@@ -28,6 +28,8 @@ const transportMasterSchema = new mongoose.Schema(
       type: String,
       required: true, // New field
     },
+    active: {type: Boolean, default:true},
+
   },
   { timestamps: true }
 );

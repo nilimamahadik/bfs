@@ -60,13 +60,12 @@
 }
 
 
-
-/* Add this to your global stylesheet or CSS module */
 .custom-row {
-  background-color: #e5e5e5 !important;
+  background-color: white!important;
 }
 
 .ant-table-thead > tr > th {
   background-color: #f5f8fa !important;
   font-weight: 600;
+
 }

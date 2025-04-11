@@ -10,6 +10,7 @@ const ProductSchema = new mongoose.Schema({
     code: { type: String, required: true },
     uom: { type: String },
     rate: { type: String },
+    active: {type: Boolean, default:true},
     group_id: { type: String, trim: true },
     
 }, { timestamps: true });

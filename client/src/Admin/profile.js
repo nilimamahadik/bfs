@@ -110,7 +110,7 @@ function AssoProfile() {
       style={{
         display: "flex",
         justifyContent: "center",
-       
+
         padding: 20,
       }}
     >
@@ -125,7 +125,7 @@ function AssoProfile() {
         }}
       >
 
-        <DataTable rows={rows} columns={columns} />
+        <DataTable rows={rows} columns={columns} toolbar={true}/>
       </Card>
     </div>
   );

@@ -51,7 +51,9 @@ export default function AdminLogin() {
         if (data.status === "Admin" && data.active === "success") {
           alert("Login successful");
           localStorage.setItem("info", JSON.stringify(data));
-          navigate(`/form/admin/${data.id}`);
+          // navigate(`/form/admin/${data.id}`);
+          navigate(`/admindashhh/${data.id}`);
+
         } else {
           alert(data.error);
         }

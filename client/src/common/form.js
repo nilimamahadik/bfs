@@ -24,6 +24,7 @@ const FormDataInfo = ({
     loader,
     setLoader,
     modalForm,
+    record,
     filteredExam,
     selectedSubject,
     selectedBranch,
@@ -78,13 +79,27 @@ const FormDataInfo = ({
         const lastSelected = checkedList[checkedList.length - 1];
         setCheckedValues(lastSelected ? [lastSelected] : []);
 
-        // Check if "For" is selected and set "total" accordingly
-        if (lastSelected === "FOR") {
-            modalForm.setFieldsValue({ total: "0.00" });
-        } else {
-            modalForm.setFieldsValue({ total: "" }); // Reset when unchecked or "Ex" is selected
-        }
+        // // Check if "For" is selected and set "total" accordingly
+        // if (lastSelected === "FOR") {
+        //     modalForm.setFieldsValue({ total: "0.00" });
+        // } else {
+        //     modalForm.setFieldsValue({ total: "" }); // Reset when unchecked or "Ex" is selected
+        // }
     };
+
+    useEffect(() => {
+        console.log(record);
+        if (record) {
+            setCheckedValues([record.checkedValues])
+
+            modalForm.setFieldsValue({
+                ...record,
+                sum: record.total_amount,
+                total: record.total_balanceamount,
+            })
+        }
+
+    }, [record]);
 
 
     useEffect(() => {
@@ -151,7 +166,11 @@ const FormDataInfo = ({
 
         const get = axios.get(`${BASEURL}/getallusers/${params.id}`)
             .then((res) => {
-                setData(res.data.data);
+
+                const filteredData = res.data.data.filter(user => !user.deleted);
+
+                setData(filteredData);
+                // setData(res.data.data);
                 //  // //consoleog(res.data);
                 localStorage.setItem("count", JSON.stringify(res.data));
             })
@@ -165,7 +184,12 @@ const FormDataInfo = ({
 
 
     const onFinish = async (values) => {
-        //console.log(values)
+        console.log(checkedValues)
+        if (checkedValues?.length === 0) {
+            alert("Please select FOR or Ex!")
+        }
+        // cole.log(values)
+
 
         const userConfirmed = window.confirm(
             "Are you sure you want to proceed with the action?"
@@ -192,7 +216,12 @@ const FormDataInfo = ({
             values.topayrate && formData.append("topayrate", values.topayrate)
             values.sum && formData.append("total_amount", values.sum)
             values.topayamt && formData.append("topayamt", values.topayamt)
+            // record && formData.append("update", record._id)
+            if (record) {
+                formData.append("update", record._id)
+                // formData.append("receipt_number", record.receipt_number)
 
+            }
             try {
                 const response = await axios.post(`${BASEURL}/submit`, formData);
                 //console.log(response);
@@ -273,7 +302,7 @@ const FormDataInfo = ({
         //console.log(topayamt);
         // Calculate "To Pay" as topayrate * total metric tons
         const finalTotal = (sumof - sc) - hamali;
-        // const topay = 
+
 
         modalForm.setFields([
             {
@@ -282,15 +311,15 @@ const FormDataInfo = ({
             },
             {
                 name: 'sum',
-                value: sumof || '',
+                value: sumof || '0.000',
             },
             {
                 name: 'total',
-                value: finalTotal || '',
+                value: finalTotal || '0.000',
             },
             {
                 name: 'topayamt',
-                value: topayamt || '',
+                value: topayamt || '0.000',
             },
         ]);
     };
@@ -298,7 +327,8 @@ const FormDataInfo = ({
     const fetchProducts = async () => {
         try {
             const response = await axios.get(`${BASEURL}/products/${params.id}`);
-            setProducts(response?.data?.products);
+            const activeProducts = response?.data?.products?.filter(product => product.active === true);
+            setProducts(activeProducts);
         } catch (error) {
         }
     };
@@ -340,22 +370,7 @@ const FormDataInfo = ({
 
         });
     };
-    const handleTransportChange = (value) => {
-        //console.log(value);
 
-        const selected = transport.find((item) => item._id === value);
-        setSelectedTransport(selected);
-
-        modalForm.setFieldsValue({
-            from: selected?.from || "",
-            transport_number: selected?.truckNo || "",
-            transport_driver_name: selected?.truckDriverName || "",
-            transport_mode: selected?.transportMode || "",
-
-
-
-        });
-    };
 
     const handleWarehouseChange = (value) => {
         //console.log(value);
@@ -429,8 +444,10 @@ const FormDataInfo = ({
                     <div className='custom-container'>
 
                         <Row gutter={16} style={{ display: 'flex', flexWrap: 'nowrap' }}>
-                            <Col span={5}>
-                                <Form.Item style={{ marginBottom: "0px" }} name="from" label="From">
+                            <Col span={9}>
+                                <Form.Item style={{ marginBottom: "0px" }} name="from" label="From"
+                                    rules={[{ required: true, message: "Please select From!" }]}
+                                >
                                     <Select
                                         showSearch
                                         placeholder="Select From"
@@ -439,6 +456,7 @@ const FormDataInfo = ({
                                         style={{ width: "100%" }}
                                         getPopupContainer={(trigger) => trigger.parentNode}
                                         onChange={handleWarehouseChange}
+
                                     >
                                         {Array.isArray(warehouse) &&
                                             warehouse.map((item) => (
@@ -456,12 +474,16 @@ const FormDataInfo = ({
 
                             </Col>
                             <Col span={5}>
-                                <Form.Item style={{ marginBottom: "0px" }} name='transport_number' label="Truck No.">
+                                <Form.Item style={{ marginBottom: "0px" }} name='transport_number' label="Truck No."
+                                    rules={[{ required: true, message: "Please enter Transport number !" }]}
+                                >
                                     <Input placeholder="Enter Truck No." />
                                 </Form.Item>
                             </Col>
                             <Col span={5}>
-                                <Form.Item style={{ marginBottom: "0px" }} name='transport_driver_name' label="Truck Driver Name">
+                                <Form.Item style={{ marginBottom: "0px" }} name='transport_driver_name' label="Truck Driver Name"
+                                    rules={[{ message: "Please enter Truck Driver Name!" }]}
+                                >
                                     <Input placeholder="Enter Truck Driver Name" />
                                 </Form.Item>
                             </Col>
@@ -471,6 +493,7 @@ const FormDataInfo = ({
                                     name="transport_mode"
                                     label="Transport Mode"
                                     initialValue={master[0]?.transportmodename?.[0]} // Set the first option as default
+                                    rules={[{ required: true, message: "Please select Transport Mode!" }]}
                                 >
                                     <Select
                                         showSearch
@@ -498,8 +521,11 @@ const FormDataInfo = ({
                     <h6>Consignor Details</h6>
                     <div className='custom-container' >
                         <Row gutter={16} style={{ display: 'flex', flexWrap: 'nowrap' }}>
-                            <Col span={5}>
-                                <Form.Item style={{ marginBottom: "0px" }} name="vendor_name" label="Name">
+                            <Col span={9}>
+                                <Form.Item style={{ marginBottom: "0px" }} name="vendor_name" label="Name"
+                                    rules={[{ required: true, message: "Please select Name of Consignor!" }]}
+
+                                >
                                     <Select
                                         showSearch
                                         placeholder="Select Name of Consignor"
@@ -521,7 +547,8 @@ const FormDataInfo = ({
 
                             </Col>
                             <Col span={5}>
-                                <Form.Item style={{ marginBottom: "0px" }} name='address' label="Address">
+                                <Form.Item style={{ marginBottom: "0px" }} name='address' label="Address"
+                                    rules={[{ required: true, message: "Please enter Address!" }]}>
                                     <Input placeholder="Enter Address" />
                                 </Form.Item>
                             </Col>
@@ -531,8 +558,9 @@ const FormDataInfo = ({
                     <h6>Consignee Details</h6>
                     <div className='custom-container'>
                         <Row gutter={16} style={{ display: 'flex', flexWrap: 'nowrap' }}>
-                            <Col span={5}>
-                                <Form.Item style={{ marginBottom: "0px" }} name="supplier_name" label="Name of Consignee">
+                            <Col span={9}>
+                                <Form.Item style={{ marginBottom: "0px" }} name="supplier_name" label="Name of Consignee"
+                                    rules={[{ required: true, message: "Please select Name of Consignee!" }]}>
                                     <Select
                                         showSearch
                                         placeholder="Select Name of Consignee"
@@ -553,12 +581,15 @@ const FormDataInfo = ({
                                 </Form.Item>
                             </Col>
                             <Col span={5}>
-                                <Form.Item style={{ marginBottom: "0px" }} name='ship_to_address1' label="Place">
+                                <Form.Item style={{ marginBottom: "0px" }} name='ship_to_address1' label="Place"
+                                    rules={[{ required: true, message: "Please enter Place!" }]}>
                                     <Input placeholder="Enter Place" />
                                 </Form.Item>
                             </Col>
                             <Col span={5}>
-                                <Form.Item style={{ marginBottom: "0px" }} name='ship_to_district' label="District">
+                                <Form.Item style={{ marginBottom: "0px" }} name='ship_to_district' label="District"
+                                    rules={[{ required: true, message: "Please enter District!" }]}
+                                >
                                     <Input placeholder="Enter District" />
                                 </Form.Item>
                             </Col>
@@ -598,12 +629,13 @@ const FormDataInfo = ({
 
                                                 }}
                                             >
-                                                <Col style={{ flex: 1 }}>
+                                                <Col style={{ flex: 2 }}>
                                                     <Form.Item
                                                         {...restField}
                                                         name={[name, "product_code"]}
                                                         fieldKey={[fieldKey, "product_code"]}
                                                         label={index === 0 ? "Product Code" : null}
+                                                        rules={[{ required: true, message: "Please enter Product Code!" }]}
                                                     >
                                                         <Select
                                                             showSearch
@@ -617,6 +649,17 @@ const FormDataInfo = ({
                                                                 const selectedProduct = products.find((product) => product.code === value);
                                                                 if (selectedProduct) {
                                                                     const updatedProducts = [...modalForm.getFieldValue("productDetails")];
+
+                                                                    updatedProducts[name] = {
+                                                                        product_code: selectedProduct.code,
+                                                                        product_name: selectedProduct.name,
+                                                                        weightperbag: selectedProduct.rate || 0,
+                                                                        weight: "", // Reset weight
+                                                                        mt: "", // Reset metric ton
+                                                                        rate: "", // Reset rate
+                                                                        total_freight: "", // Reset total freight
+
+                                                                    };
                                                                     updatedProducts[name] = {
                                                                         ...updatedProducts[name],
                                                                         product_name: selectedProduct.name,
@@ -624,6 +667,14 @@ const FormDataInfo = ({
                                                                     };
 
                                                                     modalForm.setFieldsValue({ productDetails: updatedProducts });
+                                                                    modalForm.setFields([
+                                                                        { name: "sc", value: "" },
+                                                                        { name: "hamali", value: "" },
+                                                                        { name: "topayrate", value: "" },
+                                                                        { name: "topayamt", value: "" },
+                                                                        { name: "sum", value: "" },
+                                                                        { name: "total", value: "" }
+                                                                    ]);
                                                                     updateMetricTon(name);
                                                                     modalForm.validateFields([["productDetails", name, "product_code"]])
                                                                         .catch(() => { });
@@ -695,7 +746,7 @@ const FormDataInfo = ({
                                                         name={[name, 'mt']}
                                                         fieldKey={[fieldKey, 'mt']}
                                                         label={index === 0 ? 'Weight [MT]' : null} // Show label only for the first row
-                                                        rules={[{ required: false, message: 'Please enter Weight' }]}
+                                                        rules={[{ required: true, message: 'Please enter Weight' }]}
                                                     >
 
                                                         <Input size="medium" placeholder=" enter Weight" />
@@ -720,7 +771,6 @@ const FormDataInfo = ({
                                                         name={[name, 'total_freight']}
                                                         fieldKey={[fieldKey, 'total_freight']}
                                                         label={index === 0 ? 'Total Freight' : null} // Show label only for the first row
-                                                        rules={[{ required: true, message: 'Please enter Total Freight!' }]}
                                                     >
                                                         <Input size="medium" placeholder="Enter Total Freight" />
                                                     </Form.Item>
@@ -776,15 +826,21 @@ const FormDataInfo = ({
 
                     <Row gutter={16} style={{ display: 'flex', flexWrap: 'nowrap' }}>
                         <Col style={{ flex: 1, width: "20%", marginTop: "10px", marginLeft: "20px" }}>
-                            <Checkbox.Group
-                                options={[
-                                    { label: "FOR", value: "FOR" },
-                                    { label: "Ex", value: "Ex" },
-                                ]}
-                                value={checkedValues}
-                                onChange={onChange}
-                            />
-                            <p>Selected: {checkedValues.join(", ") || "None"}</p>
+                            <Form.Item
+
+                            >
+                                <Checkbox.Group
+                                    options={[
+                                        { label: "FOR", value: "FOR" },
+                                        { label: "Ex", value: "Ex" },
+                                    ]}
+                                    value={checkedValues}
+                                    onChange={onChange}
+                                />
+                                <p>Selected: {checkedValues.join(", ") || "None"}</p>
+
+                            </Form.Item>
+
                         </Col>
 
                         <Col span={6} style={{ flex: 1, width: "10%" }}>
@@ -831,7 +887,7 @@ const FormDataInfo = ({
                             <Form.Item
                                 style={{ marginBottom: "0px" }}
                                 name='total'
-                                label="Total Balance Amount (Rs.)"
+                                label="Total Balance (Rs.)"
                             >
                                 <Input size="medium" placeholder="Enter Total" />
                             </Form.Item>
@@ -874,29 +930,47 @@ const FormDataInfo = ({
                             span: 12,
                         }}
                     >
-                        {/* Submit Button */}
-                        <Button
-                            type="primary"
-                            htmlType="submit"
-                            size="medium"
-                            loading={loader}
-                            style={{ backgroundColor: "rgb(170, 43, 29)", marginRight: "10px" }}
-                            onClick={() => setSubmitAction("submit")}
-                        >
-                            Submit
-                        </Button>
 
-                        {/* Submit & Print Button */}
-                        <Button
-                            type="primary"
-                            size="medium"
-                            htmlType="submit"
-                            loading={loader}
-                            style={{ backgroundColor: "rgb(29, 128, 170)" }}
-                            onClick={() => setSubmitAction("submit_print")}
-                        >
-                            Submit & Print
-                        </Button>
+                        {record ?
+                            <Button
+                                type="primary"
+                                htmlType="submit"
+                                size="medium"
+                                loading={loader}
+                                style={{ backgroundColor: "rgb(170, 43, 29)", marginRight: "10px" }}
+                                onClick={() => setSubmitAction("submit")}
+                            >
+                                Update
+                            </Button>
+
+                            :
+                            <>
+                                <Button
+                                    type="primary"
+                                    htmlType="submit"
+                                    size="medium"
+                                    loading={loader}
+                                    style={{ backgroundColor: "rgb(170, 43, 29)", marginRight: "10px" }}
+                                    onClick={() => setSubmitAction("submit")}
+                                >
+                                    Submit
+                                </Button>
+
+                                <Button
+                                    type="primary"
+                                    size="medium"
+                                    htmlType="submit"
+                                    loading={loader}
+                                    style={{ backgroundColor: "rgb(29, 128, 170)" }}
+                                    onClick={() => setSubmitAction("submit_print")}
+                                >
+                                    Submit & Print
+                                </Button>
+                            </>
+
+                        }
+
+
                     </Form.Item>
                 </Form>
             </Box>

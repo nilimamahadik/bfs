@@ -7,6 +7,7 @@ import {
   useGridApiContext,
   useGridSelector,
   gridPageCountSelector,
+  GridToolbarContainer,
 } from "@mui/x-data-grid";
 
 function CustomPagination() {
@@ -102,8 +103,15 @@ function CustomPagination() {
 //   );
 // };
 
+const CustomToolbar = () => {
+  return (
+    <GridToolbarContainer>
+      {/* Add any custom toolbar content here if needed */}
+    </GridToolbarContainer>
+  );
+};
 
-export const DataTable = ({ footer, rows, columns, rowHeight }) => {
+export const DataTable = ({ footer, rows, columns, rowHeight ,toolbar}) => {
   const [paginationModel, setPaginationModel] = useState({
     page: 0,
     pageSize: 10,
@@ -149,7 +157,7 @@ export const DataTable = ({ footer, rows, columns, rowHeight }) => {
         onPaginationModelChange={setPaginationModel}
         pageSizeOptions={[10, 20, 30]}
         slots={{
-          toolbar: !footer && GridToolbar,
+          toolbar: toolbar ? CustomToolbar : GridToolbar,
           pagination: CustomPagination,
         }}
         components={{

@@ -11,6 +11,7 @@ import {
     Popconfirm,
     message,
     Upload,
+    Radio,
 } from "antd";
 import { PlusOutlined, EditOutlined, DeleteOutlined, UploadOutlined } from "@ant-design/icons";
 import axios from "axios";
@@ -28,7 +29,7 @@ const ProductMaster = () => {
     ////console.log(groupId);
 
     const [products, setProducts] = useState([]);
-    // console.log(products);
+    console.log(products);
     const [currentProduct, setCurrentProduct] = useState(null); // Stores Selected Product for Editing
     const [editOpen, setEditOpen] = useState(false); // Controls Edit Modal State
     const [value, setValue] = useState({})
@@ -84,10 +85,9 @@ const ProductMaster = () => {
                         code: row[3]?.trim() || "",
                         uom: row[4]?.trim() || "",
                         rate: row[5]?.trim() || "",
-                        group_id: value?.id, // ✅ Attach the groupId
+                        group_id: value?.id,
                     }));
 
-                // ✅ Filter out invalid entries (missing required fields)
                 records = records.filter(record => record.name && record.code && record.uom && record.group_id);
 
                 if (records.length === 0) {
@@ -113,7 +113,7 @@ const ProductMaster = () => {
     };
 
     const handleEditOpen = (product) => {
-        //////console.log("Editing Product:", product);
+        console.log("Editing Product:", product);
         setCurrentProduct(product);
         editForm.setFieldsValue(product); // Pre-fill form with selected product details
         setEditOpen(true);
@@ -123,7 +123,8 @@ const ProductMaster = () => {
     // Add Product
     const addProduct = () => {
         form.validateFields().then(async (values) => {
-            ////console.log("values", values);
+            console.log("values", values);
+
             //console.log("User ID:", value.id);
             const payload = { ...values, groupId };
             try {
@@ -151,7 +152,9 @@ const ProductMaster = () => {
     const fetchProducts = async () => {
         try {
             const response = await axios.get(`${BASEURL}/products/${groupId}`);
-            setProducts(response?.data?.products);
+            const activeProducts = response?.data?.products?.filter(product => product.active === true);
+
+            setProducts(activeProducts);
         } catch (error) {
             //console.error("Error fetching products:", error);
         }
@@ -226,6 +229,24 @@ const ProductMaster = () => {
         { field: "rate", headerName: "Weight (kg)", minWidth: 40, flex: 0.5 },
         { field: "createdAt", headerName: "created Date", minWidth: 40, flex: 0.7 },
         {
+            field: "active",
+            headerName: "Status",
+            sortable: false,
+            flex: 0.4,
+            renderCell: (params) => {
+                return (
+                    <div
+                        style={{
+                            color: params.value === "ACTIVE" ? "green" : "red", // Conditional text color
+
+                        }}
+                    >
+                        {params.value}
+                    </div>
+                );
+            },
+        },
+        {
             field: "actions",
             headerName: "Actions",
             sortable: false,
@@ -234,30 +255,28 @@ const ProductMaster = () => {
                 //console.log(params.row._id._id); // Logs params for debugging
 
                 return (
-                    <Space style={{padding: "7px"}}>
-                        {/* ✅ Edit Button */}
-                        <EditOutlined onClick={() => handleEditOpen(params.row._id)} />
-
-
-                        {/* ✅ Delete Button with Confirmation */}
-                        <Popconfirm
-                            title="Are you sure you want to delete this consignee?"
-                            onConfirm={() => deleteProduct(params.row._id._id)}
-                            okText="Yes"
-                            cancelText="No"
-
-                        >
-                            <DeleteOutlined />
-
-                        </Popconfirm>
+                    <Space style={{ padding: "7px" }}>
+                        <Button
+                            type="primary"
+                            style={{
+                                backgroundColor: "#AA2B1D", // Maroon background color
+                                borderColor: "#AA2B1D", // Match border color with background
+                                color: "white", // White icon color
+                            }}
+                            icon={<EditOutlined />}
+                            onClick={() => handleEditOpen(params.row._id)}
+                        />
                     </Space>
                 );
             },
         },
+
     ];
 
 
-
+    const findstatus = (status) => {
+        return status ? 'ACTIVE' : "INACTIVE"
+    }
 
 
     const rows = products?.map((item, index) => {
@@ -267,9 +286,11 @@ const ProductMaster = () => {
             code: item.code || "NA",
             uom: item.uom || "NA",
             rate: item.rate || "NA",
-            _id: item, // ✅ Include _id for delete action
+            _id: item,
             createdAt: getIndianTimestamp(item.createdAt) || "NA",
             manufacturer: item.manufacturer || "NA",
+            active: findstatus(item.active) || "NA"
+
         };
     }) || [];
     // "Inter", "Source Sans Pro", Helvetica, Arial, sans-serif;
@@ -277,19 +298,19 @@ const ProductMaster = () => {
         <div >
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px", marginTop: "5px" }}>
                 <Typography.Title
-                     level={3}
-                     style={{
-                       color: "black",
-                       height: "10px",
-                       margin: 0,
-                       marginLeft:"5px",
-                       fontWeight:"400",
-                       fontSize: "20px",
-                   }}
+                    level={3}
+                    style={{
+                        color: "black",
+                        height: "10px",
+                        margin: 0,
+                        marginLeft: "5px",
+                        fontWeight: "400",
+                        fontSize: "20px",
+                    }}
                 >
-                 <MdArrowBack />   Product Master
+                    <MdArrowBack />   Product Master
                 </Typography.Title>
-                <div style={{marginRight:"30px"}}>
+                <div style={{ marginRight: "30px" }}>
                     <Button type="default" icon={<PlusOutlined />} onClick={handleOpen} style={{ marginRight: "10px" }}>
                         Add Product
                     </Button>
@@ -298,31 +319,7 @@ const ProductMaster = () => {
                     </Button>
                 </div>
             </div>
-            {/* <Typography.Title
-                level={2}
-                style={{
-                    backgroundColor: "#AA2B1D",
-                    color: "white",
-                    height: "60px",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    margin: 0, // Remove default margin
-                    textAlign: "center",
-                }}
-            >
-                Product Master
-            </Typography.Title>
 
-            <div style={{ display: "flex", justifyContent: "center", marginBottom: "20px", marginTop: "20px" }}>
-                <Button type="default" icon={<PlusOutlined />} onClick={handleOpen} style={{ marginRight: "10px" }}>
-                    Add Product
-                </Button>
-                <Button type="default" icon={<UploadOutlined />} onClick={() => setBulkUploadOpen(true)}>
-                    Bulk Upload
-                </Button>
-            </div> */}
-            {/* Product Form Modal */}
             <Modal
                 title=" Add a New Product"
                 open={open}
@@ -361,7 +358,7 @@ const ProductMaster = () => {
                     <Form.Item
                         label="Unit of Measurement (UM)"
                         name="uom"
-                        rules={[{ message: "Please enter unit of measurement" }]}
+                        rules={[{ required: true, message: "Please enter unit of measurement" }]}
                     >
                         <Input placeholder="Enter unit of measurement" />
                     </Form.Item>
@@ -369,14 +366,14 @@ const ProductMaster = () => {
                     <Form.Item
                         label="Product Weight"
                         name="rate"
-                        rules={[{ message: "Please enter Product Weight" }]}
+                        rules={[{ required: true, message: "Please enter Product Weight" }]}
                     >
                         <Input placeholder="Enter Product Weight" />
                     </Form.Item>
                 </Form>
             </Modal>
             <Modal
-                title="✏️ Edit Product"
+                title="Edit Product"
                 open={editOpen} // Ensure this is linked to editOpen state
                 onCancel={() => setEditOpen(false)} // Close modal when clicking outside
                 onOk={editProduct}
@@ -411,7 +408,7 @@ const ProductMaster = () => {
                     <Form.Item
                         label="Unit of Measurement (UM)"
                         name="uom"
-                        rules={[{ message: "Please enter unit of measurement" }]}
+                        rules={[{ required: true, message: "Please enter unit of measurement" }]}
                     >
                         <Input placeholder="Enter unit of measurement" />
                     </Form.Item>
@@ -419,11 +416,22 @@ const ProductMaster = () => {
                     <Form.Item
                         label="Product Weight"
                         name="rate"
-                        rules={[{ message: "Please enter Product Weight" }]}
+                        rules={[{ required: true, message: "Please enter Product Weight" }]}
                     >
                         <Input placeholder="Enter Product Weight" />
                     </Form.Item>
+                    <Form.Item
+                        name='active'
+                        label="Status"
+                        rules={[{ required: true, message: 'Please select a status!' }]}
+                    >
+                        <Radio.Group>
+                            <Radio value={true}>Active</Radio>
+                            <Radio value={false}>Inactive</Radio>
+                        </Radio.Group>
+                    </Form.Item>
                 </Form>
+
             </Modal>
             {/* Product List */}
             {products.length > 0 && (

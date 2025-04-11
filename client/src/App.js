@@ -65,6 +65,7 @@ import StockReport from "./Admin/stockreport";
 import TransportMaster from "./Admin/TransportMaster";
 import ConsignorMaster from "./Admin/ConsignorMaster";
 import { MdArrowBack } from "react-icons/md";
+import Recycle from "./common/recyclebin";
 
 const router = createBrowserRouter([
   {
@@ -116,6 +117,17 @@ const router = createBrowserRouter([
       </Drawer>
     )
   },
+  {
+    path: "/recycle/:groupId",
+    element: (
+      <Drawer>
+        <div className="App" >
+          <Recycle />
+        </div>
+      </Drawer>
+    )
+  },
+  
   {
     path: "/consigneemaster/:groupId",
     element: (

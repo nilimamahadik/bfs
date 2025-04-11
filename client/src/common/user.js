@@ -91,7 +91,10 @@ const FormExample = (props) => {
 
     const get = axios.get(`${BASEURL}/getallusers/${params.id}`)
       .then((res) => {
-        setData(res.data.data);
+        // setData(res.data.data);
+        const filteredData = res.data.data.filter(user => !user.deleted);
+        setData(filteredData);
+
         localStorage.setItem("count", JSON.stringify(res.data));
       })
       .catch((err) => {
@@ -308,7 +311,7 @@ const FormExample = (props) => {
 
         <Space style={{ padding: "7px" }}>
           <EditOutlined onClick={() => handleEdit(params.row)} size={30} />
-         
+
         </Space>
       ),
     },
@@ -590,7 +593,7 @@ const FormExample = (props) => {
                   name="sum"
                   label="Total Amount (Rs.)"
                 >
-                  <Input size="medium" placeholder="Enter Total Amount" />
+                  <Input size="medium" placeholder="Enter Total Amount" readOnly />
                 </Form.Item>
               </Col>
 
@@ -600,7 +603,7 @@ const FormExample = (props) => {
                   name='sc'
                   label="Advance Cash (Rs.)"
                 >
-                  <Input size="medium" placeholder="Enter Advance Cash " />
+                  <Input size="medium" placeholder="Enter Advance Cash " readOnly />
                 </Form.Item>
               </Col>
 
@@ -611,7 +614,7 @@ const FormExample = (props) => {
                   name='hamali'
                   label="Diesel (Rs.)"
                 >
-                  <Input size="medium" placeholder="Enter Diesel" />
+                  <Input size="medium" placeholder="Enter Diesel" readOnly />
                 </Form.Item>
               </Col>
 
@@ -623,7 +626,7 @@ const FormExample = (props) => {
                   name='total_balanceamount'
                   label="Total Balance Amount (Rs.)"
                 >
-                  <Input size="medium" placeholder="Enter Total" />
+                  <Input size="medium" placeholder="Enter Total" readOnly />
                 </Form.Item>
               </Col>
 
@@ -637,7 +640,7 @@ const FormExample = (props) => {
                   <Input
                     size="medium"
                     placeholder="Enter Rate"
-
+                    readOnly
                   />
                 </Form.Item>
               </Col>
@@ -648,7 +651,7 @@ const FormExample = (props) => {
                   name="topayamt"
                   label="To Pay (Rs.)"
                 >
-                  <Input size="medium" placeholder="Enter To Pay" />
+                  <Input size="medium" placeholder="Enter To Pay" readOnly />
                 </Form.Item>
 
               </Col>

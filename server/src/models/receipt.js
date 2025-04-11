@@ -62,10 +62,13 @@ const applySchema = new mongoose.Schema(
     group_id: { type: String, trim: true },
     receiver: { type: String, trim: true },
     regenerateEnabled: { type: Boolean, default: false },
-    checkedValues: { type: String, trim: true },
+    checkedValues: { type: String, required: true },
     topayrate: { type: Number, trim: true },
     topayamt: { type: Number, trim: true },
     total_amount: { type: Number, trim: true },
+    deleted: { type: Boolean, default: false }, 
+    deletedAt :{ type: Date },
+    deleted_By: { type: String, required: true },
   },
   { timestamps: true }
 );

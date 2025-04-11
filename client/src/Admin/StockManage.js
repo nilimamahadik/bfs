@@ -252,31 +252,18 @@ const StockManage = () => {
                 //console.log(params.row._id._id); // Logs params for debugging
 
                 return (
-                    <Space style={{padding: "7px"}}>
-                        <EditOutlined onClick={() => handleEditOpen(params.row._id)} />
-                        {/* ✅ Edit Button */}
-                        {/* <Button
+                    <Space style={{ padding: "7px" }}>
+                        <Button
+                            type="primary"
+                            style={{
+                                backgroundColor: "#AA2B1D", // Maroon background color
+                                borderColor: "#AA2B1D", // Match border color with background
+                                color: "white", // White icon color
+                            }}
                             icon={<EditOutlined />}
                             onClick={() => handleEditOpen(params.row._id)}
-                            style={{
-                                backgroundColor: "#77B254",
-                                color: "white",
-                                borderColor: "green",
-                            }}
-                        >
-                            Edit
-                        </Button> */}
+                        />
 
-                        {/* ✅ Delete Button with Confirmation */}
-                        <Popconfirm
-                            title="Are you sure you want to delete this consignee?"
-                            onConfirm={() => deleteStock(params.row._id._id)}
-                            okText="Yes"
-                            cancelText="No"
-                        >
-                            <DeleteOutlined />
-
-                        </Popconfirm>
                     </Space>
                 );
             },
@@ -306,7 +293,8 @@ const StockManage = () => {
     const fetchProducts = async () => {
         try {
             const response = await axios.get(`${BASEURL}/products/${groupId}`);
-            setProducts(response?.data?.products);
+            const activeProducts = response?.data?.products?.filter(product => product.active === true);
+            setProducts(activeProducts);
         } catch (error) {
         }
     };

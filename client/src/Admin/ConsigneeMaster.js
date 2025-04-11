@@ -10,7 +10,8 @@ import {
     Card,
     Upload,
     Popconfirm,
-    message
+    message,
+    Radio
 } from "antd";
 import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import { PlusOutlined, UploadOutlined } from "@ant-design/icons";
@@ -225,6 +226,24 @@ const ConsigneeMaster = () => {
             flex: 0.5,
         },
         {
+            field: "active",
+            headerName: "Status",
+            sortable: false,
+            flex: 0.4,
+            renderCell: (params) => {
+                return (
+                    <div
+                        style={{
+                            color: params.value === "ACTIVE" ? "green" : "red", // Conditional text color
+
+                        }}
+                    >
+                        {params.value}
+                    </div>
+                );
+            },
+        },
+        {
             field: "actions",
             headerName: "Actions",
             sortable: false,
@@ -232,20 +251,21 @@ const ConsigneeMaster = () => {
             renderCell: (params) => {
 
                 return (
-                    <Space style={{padding: "7px"}}>
+                    <Space style={{ padding: "7px" }}>
                         {/* ✅ Edit Button */}
-                        <EditOutlined size={30} onClick={() => handleEditOpen(params.row._id)}
+                        {/* <EditOutlined size={30} onClick={() => handleEditOpen(params.row._id)}
+                        /> */}
+                        <Button
+                            type="primary"
+                            style={{
+                                backgroundColor: "#AA2B1D", // Maroon background color
+                                borderColor: "#AA2B1D", // Match border color with background
+                                color: "white", // White icon color
+                            }}
+                            icon={<EditOutlined />}
+                            onClick={() => handleEditOpen(params.row._id)}
                         />
-                      
-                        <Popconfirm
-                            title="Are you sure you want to delete this consignee?"
-                            onConfirm={() => deleteConsignee(params.row._id._id)}
-                            okText="Yes"
-                            cancelText="No"
-                        >
-                            <DeleteOutlined size={30}/>
-                            
-                        </Popconfirm>
+
                     </Space>
                 );
             },
@@ -253,6 +273,10 @@ const ConsigneeMaster = () => {
     ];
 
 
+
+    const findstatus = (status) => {
+        return status ? 'ACTIVE' : "INACTIVE"
+    }
 
 
 
@@ -267,6 +291,7 @@ const ConsigneeMaster = () => {
             mobileNo: item.mobileNo || "NA",
             createdDate: getIndianTimestamp(item.createdAt) || "NA",
             _id: item, // ✅ Include _id for delete action
+            active: findstatus(item.active) || "NA"
         };
     }) || [];
 
@@ -357,7 +382,7 @@ const ConsigneeMaster = () => {
                     <Form.Item
                         label="District"
                         name="district"
-                        rules={[{ message: "Please enter District" }]}
+                        rules={[{ required: true, message: "Please enter District" }]}
                     >
                         <Input placeholder="Enter District" />
                     </Form.Item>
@@ -411,16 +436,26 @@ const ConsigneeMaster = () => {
                     >
                         <Input placeholder="Enter Mobile Number" />
                     </Form.Item>
+                    <Form.Item
+                        name='active'
+                        label="Status"
+                        rules={[{ required: true, message: 'Please select a status!' }]}
+                    >
+                        <Radio.Group>
+                            <Radio value={true}>Active</Radio>
+                            <Radio value={false}>Inactive</Radio>
+                        </Radio.Group>
+                    </Form.Item>
                 </Form>
             </Modal>
             {/* Consignee List */}
             {products.length > 0 && (
                 //// console.log(products),
 
-              
-                    <DataTable rows={rows} columns={columns} />
 
-              
+                <DataTable rows={rows} columns={columns} />
+
+
 
 
             )}

@@ -42,7 +42,7 @@ const style = {
   boxShadow: 24,
   p: 1,
   "@media (min-width: 600px)": { // For larger screens (web)
-    width: "75%",
+    width: "78%",
     p: 3,
   },
 };
@@ -54,11 +54,15 @@ const FormExampleAdmin = (props) => {
   const [receipt, setReceipt] = useState([]);
   const { Title } = Typography;
   const [value, setValue] = useState({})
+  console.log(value);
+
   const navigate = useNavigate();
   const [graceOpen, setGraceOpen] = useState(false)
   const [modalForm] = Form.useForm();
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [editingReceipt, setEditingReceipt] = useState(null);
+  const [consignee, setConsignees] = useState([]);
+
   // // console.log(editingReceipt);
   const [master, setMaster] = useState([]);
   const [selectedId, setSelectedId] = useState(null); // Initialize selectedId
@@ -66,6 +70,10 @@ const FormExampleAdmin = (props) => {
   const [productDetails, setProductDetails] = useState([]);
   // console.log("productDetails", productDetails);
   const [check, setCheck] = useState([]);
+  const [consignor, setConsignors] = useState([]);
+  const [selectedConsignor, setSelectedConsignor] = useState(null);
+  const [selectedConsignee, setSelectedConsignee] = useState(null);
+  const [record, setRecord] = useState(null)
 
   const [formData, setFormData] = useState({
     vendor_name: "",
@@ -87,7 +95,9 @@ const FormExampleAdmin = (props) => {
 
     const get = axios.get(`${BASEURL}/getallusers/${params.id}`)
       .then((res) => {
-        setData(res.data.data);
+        console.log(res);
+        const filteredData = res.data.data.filter(user => !user.deleted);
+        setData(filteredData);
         localStorage.setItem("count", JSON.stringify(res.data));
       })
       .catch((err) => {
@@ -98,6 +108,28 @@ const FormExampleAdmin = (props) => {
 
   }, []);
 
+  const fetchConsignees = async () => {
+    try {
+      const response = await axios.get(`${BASEURL}/consignee/${params.id}`);
+
+      setConsignees(response?.data?.products);
+    } catch (error) {
+    }
+  };
+  const fetchConsignors = async () => {
+    try {
+      const response = await axios.get(`${BASEURL}/consignor/${params.id}`);
+      setConsignors(response?.data?.products);
+    } catch (error) {
+      // // console.error("Error fetching products:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchConsignees();
+    fetchConsignors();
+
+  }, []);
 
   useEffect(() => {
     const savedInfo = localStorage.getItem("info");
@@ -139,48 +171,21 @@ const FormExampleAdmin = (props) => {
   const handleUserClose = () => {
     setGraceOpen(false)
     modalForm.resetFields()
+    setRecord(null)
   }
 
   const handleEdit = (record) => {
-
-    // console.log("Editing record:", record);
-    setSelectedId(record.record_id); // Set the selected ID
-    setEditingReceipt(record.record_id); // Set the record ID for editing
-    setProductDetails(record.productDetails || []);
-    setCheck(record.checkedValues || []);
-
-    modalForm.setFieldsValue({
-      vendor_name: record.vendor_name || "",
-      address: record.address || "",
-      supplier_name: record.supplier_name || "",
-      transport_number: record.transport_number || "",
-      transport_driver_name: record.transport_driver_name || "",
-      mobileNo: record.mobileNo || "",
-      ship_to_address1: record.ship_to_address1 || "",
-      ship_to_district: record.ship_to_district || "",
-      transport_mode: record.transport_mode || "",
-      productDetails: record.productDetails || [],
-      sum: record.sum || "",
-      sc: record.sc || "",
-      hamali: record.hamali || "",
-      total: record.total || "",
-      topayrate: record.topayrate || "",
-      topayamt: record.topayamt || "",
-      from: record.from || "",
-      checkedValues: record.checkedValues || "",
-      total_balanceamount: record.total_balanceamount || "",
+    setGraceOpen(true)
+    setRecord(record)
 
 
-
-    });
-
-    setEditModalOpen(true); // Open the modal
   };
 
 
   const deleteStock = async (id) => {
+  
     try {
-      await axios.delete(`${BASEURL}/lrdelete/${id}`);
+      await axios.patch(`${BASEURL}/lrdelete/${id}/${value.status}` );
       setReceipt(receipt.filter((Stock) => Stock._id !== id));
 
       message.success({
@@ -199,12 +204,13 @@ const FormExampleAdmin = (props) => {
     }
   };
 
-
   const columns = [
     { field: "id", headerName: "S.N.", minWidth: 50, flex: 1, pinned: "left" },
     { field: "receipt_number", headerName: "LR No.", minWidth: 150, flex: 1 },
 
     { field: "Date", headerName: "Date", minWidth: 200, flex: 1 },
+    { field: "checkedValues", headerName: "Delivery Type", minWidth: 150, flex: 1 },
+
     {
       field: "receipt",
       headerName: "View LR",
@@ -269,7 +275,7 @@ const FormExampleAdmin = (props) => {
     {
       field: "total",
       headerName: "Total Freight",
-      minWidth: 200,
+      minWidth: 150,
       flex: 1,
       renderCell: (params) => (
         <div>
@@ -288,24 +294,56 @@ const FormExampleAdmin = (props) => {
         </div>
       ),
     },
-    { field: "checkedValues", headerName: "Delivery Type", minWidth: 150, flex: 1 },
     {
       field: "actions",
       headerName: "Actions",
-
+      minWidth: 150,
+      flex: 1,
       renderCell: (params) => (
         // console.log("params", params.row),
 
         <Space style={{ padding: "7px" }}>
-          <EditOutlined onClick={() => handleEdit(params.row)} size={30} />
+          {/* Edit Action */}
           <Popconfirm
-            title="Are you sure you want to delete this consignee?"
+            title={
+              <span>
+                Are you sure you want to edit this{" "}
+                <b style={{ color: "blue" }}>{params.row.receipt_number}</b> Lorry Receipt?
+              </span>
+            }
+            onConfirm={() => handleEdit(params.row.doc)}
+            okText="Yes"
+            cancelText="No"
+          >
+            <EditOutlined
+              style={{
+                fontSize: "20px", // Increased size
+                color: "#1890ff", // Blue color for edit icon
+                cursor: "pointer", // Pointer cursor for better UX
+              }}
+            />
+          </Popconfirm>
+
+          {/* Delete Action */}
+          <Popconfirm
+            title={
+              <span>
+                Are you sure you want to delete this{" "}
+                <b style={{ color: "red" }}>{params.row.receipt_number}</b> Lorry Receipt?
+              </span>
+            }
             onConfirm={() => deleteStock(params.row.record_id)}
             okText="Yes"
             cancelText="No"
           >
-            <DeleteOutlined />
-
+            <DeleteOutlined
+              style={{
+                fontSize: "20px", // Increased size
+                color: "red", // Red color for delete icon
+                cursor: "pointer", // Pointer cursor for better UX
+                marginLeft: "15px"
+              }}
+            />
           </Popconfirm>
         </Space>
       ),
@@ -329,7 +367,7 @@ const FormExampleAdmin = (props) => {
         <RWebShare
           data={{
             text: "BHARAT ONLINE",
-            url: `${window.location.protocol}//${window.location.host}/poster/${params.row.record_id}`,
+            url: `${window.location.protocol}/${window.location.host}/poster/${params.row.record_id}`,
             title: "BHARAT ONLINE",
           }}
         >
@@ -359,14 +397,13 @@ const FormExampleAdmin = (props) => {
       transport_mode: item.transport_mode || "NA",
       sum: item.total_amount || "0",
       sc: item.sc || "0",
-
       hamali: item.sch || "0",
       total_balanceamount: item.total_balanceamount || "0",
       mobileNo: item.mobileNo || "NA",
       total: item.total || "0",
       topayrate: item.topayrate || "0",
       topayamt: item.topayamt || "0",
-
+      doc: item
     };
   }) || [];
 
@@ -384,18 +421,16 @@ const FormExampleAdmin = (props) => {
             fontWeight: "400"
           }}
         >
-          <MdArrowBack />     Lorry Receipt
+          <MdArrowBack />     Generate Lorry Receipt
         </Typography.Title>
         <div style={{ marginRight: "30px" }}>
-          <Button variant="contained" type="submit" style={{ marginRight: "10px" }} onClick={handleGraceMarks} startIcon={<IoMdAdd />} >   Generate   </Button>
+          <Button variant="contained" type="submit" style={{ marginRight: "10px", backgroundColor: "rgb(170, 43, 29)", padding: "4px 8px" }} onClick={handleGraceMarks} startIcon={<IoMdAdd />} >   Generate   </Button>
 
         </div>
       </div>
-
       <div >
 
         <div >
-
           <DataTable rows={rows} columns={columns} />
         </div>
 
@@ -406,266 +441,8 @@ const FormExampleAdmin = (props) => {
         props={props}
         style={style}
         modalForm={modalForm}
+        record={record}
       />
-      <Modal
-        open={editModalOpen}
-        onClose={() => setEditModalOpen(false)} // Close the modal
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
-        <Box sx={style}>
-          <Title level={3} className="m-2 text-center" style={{ color: "rgb(170, 43, 29)" }}>
-            Edit Lorry Receipt
-          </Title>
-          <hr />
-
-          <Form
-            form={modalForm}
-            className="custom-form"
-            name="basic"
-            labelCol={{ span: 24 }}
-            wrapperCol={{ span: 24 }}
-            autoComplete="off"
-            onFinish={handleSaveEdit} // Call handleSaveEdit on form submission
-          >
-            {/* Add your form fields here */}
-            <h6>Transportation Details</h6>
-            <div className="custom-container">
-              <Row gutter={16} style={{ display: "flex", flexWrap: "nowrap" }}>
-                <Col span={5}>
-                  <Form.Item name="from" label="From">
-
-                    <Input placeholder="Enter From" />
-                  </Form.Item>
-                </Col>
-                <Col span={5}>
-                  <Form.Item name="transport_number" label="Truck No.">
-                    <Input placeholder="Enter Truck No." />
-                  </Form.Item>
-                </Col>
-                <Col span={5}>
-                  <Form.Item name="transport_driver_name" label="Truck Driver Name">
-                    <Input placeholder="Enter Truck Driver Name" />
-                  </Form.Item>
-                </Col>
-                <Col span={5}>
-                  <Form.Item name="transport_mode" label="Transport Mode">
-                    <Select
-                      showSearch
-                      placeholder="Select Transport Mode"
-                      optionFilterProp="label"
-                      size="medium"
-                      style={{ width: "100%" }}
-                      options={master[0]?.transportmodename?.map((mode) => ({
-                        value: mode,
-                        label: mode,
-                      }))}
-                      getPopupContainer={(trigger) => trigger.parentNode}
-                    />
-                  </Form.Item>
-                </Col>
-              </Row>
-            </div>
-
-            <h6>Consignor Details</h6>
-            <div className='custom-container' >
-              <Row gutter={16} style={{ display: 'flex', flexWrap: 'nowrap' }}>
-                <Col span={5}>
-                  <Form.Item style={{ marginBottom: "0px" }} name="vendor_name" label="Name">
-                    <Input placeholder="Enter Consignor Name" />
-                  </Form.Item>
-
-                </Col>
-                <Col span={5}>
-                  <Form.Item style={{ marginBottom: "0px" }} name='address' label="Address">
-                    <Input placeholder="Enter Address" />
-                  </Form.Item>
-                </Col>
-              </Row>
-            </div>
-            <h6>Consignee Details</h6>
-            <div className='custom-container'>
-              <Row gutter={16} style={{ display: 'flex', flexWrap: 'nowrap' }}>
-                <Col span={5}>
-                  <Form.Item style={{ marginBottom: "0px" }} name="supplier_name" label="Name of Consignee">
-                    <Input placeholder="Enter Consignee Name" />
-                  </Form.Item>
-                </Col>
-                <Col span={5}>
-                  <Form.Item style={{ marginBottom: "0px" }} name='ship_to_address1' label="Place">
-                    <Input placeholder="Enter Place" />
-                  </Form.Item>
-                </Col>
-                <Col span={5}>
-                  <Form.Item style={{ marginBottom: "0px" }} name='ship_to_district' label="District">
-                    <Input placeholder="Enter District" />
-                  </Form.Item>
-                </Col>
-                <Col span={5}>
-                  <Form.Item
-                    style={{ marginBottom: "0px" }}
-                    name='mobileNo'
-                    label="Mobile Number"
-
-                  >
-                    <Input placeholder="Enter Mobile Number" />
-                  </Form.Item>
-                </Col>
-              </Row>
-            </div>
-            <h6>Goods Details</h6>
-            <div className="custom-container">
-              {productDetails?.map((product, index) => (
-                <Row
-                  key={index}
-                  gutter={16}
-                  style={{ display: "flex", flexWrap: "nowrap", marginBottom: "10px" }}
-                >
-                  <Col span={4}>
-                    <Form.Item
-                      style={{ marginBottom: "0px" }}
-                      label={index === 0 ? "Product Code" : null}
-                    >
-                      <Input value={product.product_code} readOnly />
-                    </Form.Item>
-                  </Col>
-                  <Col span={4}>
-                    <Form.Item
-                      style={{ marginBottom: "0px" }}
-                      label={index === 0 ? "Product Name" : null}
-                    >
-                      <Input value={product.product_name} readOnly />
-                    </Form.Item>
-                  </Col>
-                  <Col span={4}>
-                    <Form.Item
-                      style={{ marginBottom: "0px" }}
-                      label={index === 0 ? "No. of Bags" : null}
-                    >
-                      <Input value={product.weight} readOnly />
-                    </Form.Item>
-                  </Col>
-                  <Col span={4}>
-                    <Form.Item
-                      style={{ marginBottom: "0px" }}
-                      label={index === 0 ? "Weight [MT]" : null}
-                    >
-                      <Input value={product.mt} readOnly />
-                    </Form.Item>
-                  </Col>
-                  <Col span={4}>
-                    <Form.Item
-                      style={{ marginBottom: "0px" }}
-                      label={index === 0 ? "Rate" : null}
-                    >
-                      <Input value={product.rate} readOnly />
-                    </Form.Item>
-                  </Col>
-                  <Col span={4}>
-                    <Form.Item
-
-                      style={{ marginBottom: "0px" }}
-                      label={index === 0 ? "Total Freight" : null}
-                    >
-                      <Input value={product.total_freight} readOnly />
-                    </Form.Item>
-                  </Col>
-                </Row>
-              ))}
-            </div>
-
-            <Row gutter={16} style={{ display: 'flex', flexWrap: 'nowrap', marginLeft: "3px" }}>
-
-
-
-              <p style={{ fontSize: "15px" }}> <strong>Delivery Type:</strong>  {check}</p>
-            </Row>
-
-            <Row gutter={16} style={{ display: 'flex', flexWrap: 'nowrap' }}>
-              <Col span={4}>
-                <Form.Item
-                  style={{ marginBottom: '5px' }}
-                  name="sum"
-                  label="Total Amount (Rs.)"
-                >
-                  <Input size="medium" placeholder="Enter Total Amount" />
-                </Form.Item>
-              </Col>
-
-              <Col span={4}>
-                <Form.Item
-                  style={{ marginBottom: "0px" }}
-                  name='sc'
-                  label="Advance Cash (Rs.)"
-                >
-                  <Input size="medium" placeholder="Enter Advance Cash " />
-                </Form.Item>
-              </Col>
-
-
-              <Col span={4}>
-                <Form.Item
-                  style={{ marginBottom: "0px" }}
-                  name='hamali'
-                  label="Diesel (Rs.)"
-                >
-                  <Input size="medium" placeholder="Enter Diesel" />
-                </Form.Item>
-              </Col>
-
-
-              {/* Roll Number */}
-              <Col span={4}>
-                <Form.Item
-                  style={{ marginBottom: "0px" }}
-                  name='total_balanceamount'
-                  label="Total Balance Amount (Rs.)"
-                >
-                  <Input size="medium" placeholder="Enter Total" />
-                </Form.Item>
-              </Col>
-
-
-              <Col span={4}>
-                <Form.Item
-                  style={{ marginBottom: "0px" }}
-                  name="topayrate"
-                  label="Rate"
-                >
-                  <Input
-                    size="medium"
-                    placeholder="Enter Rate"
-
-                  />
-                </Form.Item>
-              </Col>
-              <Col span={4}>
-
-
-                <Form.Item
-                  name="topayamt"
-                  label="To Pay (Rs.)"
-                >
-                  <Input size="medium" placeholder="Enter To Pay" />
-                </Form.Item>
-
-              </Col>
-
-
-            </Row>
-            <Form.Item style={{ marginBottom: "15px" }} wrapperCol={{ offset: 10, span: 12 }}>
-              <Button
-                type="default"
-                htmlType="submit"
-                size="medium"
-                style={{ backgroundColor: "rgb(170, 43, 29)", marginRight: "10px", color: "white" }}
-              >
-                Save
-              </Button>
-            </Form.Item>
-          </Form>
-        </Box>
-      </Modal>
 
 
     </>

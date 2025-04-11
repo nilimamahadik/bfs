@@ -1,108 +1,6 @@
 const receipt = require("../models/receipt");
+const mongoose = require("mongoose");
 
-
-
-// exports.submit_form = async (req, res) => {
-//     try {
-//         const date = new Date();
-//         const formattedDate = date.toISOString().split("T")[0].replace(/-/g, ""); // YYYYMMDD
-
-//         const {
-//             vendor_name,
-//             address,
-//             supplier_name,
-//             mobileNo,
-//             ship_to_address1,
-//             ship_to_district,
-//             transport_mode,
-//             transport_number,
-//             transport_driver_name,
-//             productDetails, // Already an array from frontend
-//             total_freight,
-//             advance_paid,
-//             to_pay,
-//             sc,
-//             hamali,
-//             sch,
-//             total,
-//             from,
-//             group_id,
-//             receiver,
-//             checkedValues
-//         } = req.body;
-
-//         // console.log("body", req.body);
-
-//         const parsed_productdetails = productDetails && JSON.parse(productDetails)
-
-//         const groupPrefix = group_id
-//             .split(" ")
-//             .map(word => word[0])
-//             .join("")
-//             .toUpperCase(); // Example: "Kisan Seeds Corporation" → "KSC"
-
-//         const existingReceipt = await receipt.findOne({
-//             vendor_name: vendor_name?.trim(),
-//             group_id: group_id?.trim(),
-//         });
-
-
-
-//         const lastReceipt = await receipt.findOne({
-//             receipt_number: new RegExp(`^${groupPrefix}-${formattedDate}-`, "i"),
-//         })
-//             .sort({ tran_date: -1 }) // Sort by latest transaction date
-//             .exec();
-
-//         let nextCounter = 1;
-//         if (lastReceipt) {
-//             const lastNumber = parseInt(lastReceipt.receipt_number.split("-").pop(), 10);
-//             nextCounter = lastNumber + 1;
-//         }
-
-//         const receiptNo = `${groupPrefix}-${formattedDate}-${nextCounter}`;
-
-//         const newReceipt = new receipt({
-//             tran_date: new Date(),
-//             receipt_number: receiptNo,
-//             vendor_name: vendor_name.trim(),
-//             address: address.trim(),
-//             from: from ? from.trim() : "",
-//             productDetails: parsed_productdetails, // Directly use without JSON.parse
-//             ship_to_address1: ship_to_address1 ? ship_to_address1.trim() : "",
-//             ship_to_district: ship_to_district ? ship_to_district.trim() : "",
-//             transport_mode: transport_mode ? transport_mode.trim() : "",
-//             supplier_name: supplier_name ? supplier_name.trim() : "",
-//             mobileNo: mobileNo,
-//             transport_number: transport_number ? transport_number.trim() : "",
-//             transport_driver_name: transport_driver_name ? transport_driver_name.trim() : "",
-//             total_freight: total_freight || 0,
-//             advance_paid: advance_paid || 0,
-//             to_pay: to_pay || 0,
-//             sc: sc && sc,
-//             hamali: hamali || 0,
-//             sch: sch || 0,
-//             total: total || 0,
-//             group_id: group_id?.trim(),
-//             receiver: receiver ? receiver.trim() : "",
-//             checkedValues: checkedValues ? checkedValues.trim() : ""
-//         });
-
-//         const savedReceipt = await newReceipt.save();
-
-//         return res.status(201).json({
-//             data: savedReceipt,
-//             status: "success",
-//             message: "Receipt Saved Successfully",
-//         });
-//     } catch (error) {
-//         console.error("Error saving receipt:", error.message);
-//         return res.status(500).json({
-//             status: "error",
-//             message: "Something went wrong while saving the receipt",
-//         });
-//     }
-// };
 
 
 exports.submit_form = async (req, res) => {
@@ -131,101 +29,146 @@ exports.submit_form = async (req, res) => {
             checkedValues,
             topayrate,
             total_amount,
-            topayamt
+            topayamt,
+            update
         } = req.body;
+
+        // console.log("1", req.body);
 
         // Parse productDetails if it's a string
         const parsed_productdetails = typeof productDetails === "string" ? JSON.parse(productDetails) : productDetails;
         //console.log("Parsed Product Details:", parsed_productdetails);
+        if (update) {
+            console.log("update", update);
 
-        // Extract the first product name from the productDetails array
-        let firstProduct = parsed_productdetails?.[0]?.product_name?.toLowerCase().trim();
-        //console.log("Original Product Name:", firstProduct);
+            const updatedReceipt = await receipt.findOneAndUpdate(
+                {
+                    _id: new mongoose.Types.ObjectId(update)
+                },
+                {
+                    $set: {
+                        from: from && from,
+                        transport_number: transport_number && transport_number,
+                        transport_driver_name: transport_driver_name && transport_driver_name,
+                        transport_mode: transport_mode && transport_mode,
+                        vendor_name: vendor_name && vendor_name,
+                        address: address && address,
+                        supplier_name: supplier_name && supplier_name,
+                        mobileNo: mobileNo && mobileNo,
+                        ship_to_address1: ship_to_address1 && ship_to_address1,
+                        ship_to_district: ship_to_district && ship_to_district,
+                        productDetails: parsed_productdetails && parsed_productdetails,
+                        sc: sc && sc,
+                        hamali: hamali && hamali,
+                        total_balanceamount: total_balanceamount && total_balanceamount,
+                        checkedValues: checkedValues && checkedValues,
+                        total_amount: total_amount && total_amount,
+                    }
+                },
+                { new: true }
+            );
 
-        // Extract the relevant part of the product name (e.g., "chambal" or "coromandel")
-        if (firstProduct) {
-            const match = firstProduct.match(/chambal|coromandel/i); // Match "chambal" or "coromandel" (case-insensitive)
-            firstProduct = match ? match[0].toLowerCase() : firstProduct; // Use the matched value or fallback to the original
+            // console.log("updatedReceipt", updatedReceipt);
+
+            // Log update result
+            if (updatedReceipt) {
+                res.status(200).json({ message: "Receipt updated successfully", updatedReceipt });
+            } else {
+                res.status(500).json({ error: "Internal Server Error" });
+            }
+
+
+        } else {
+            // Extract the first product name from the productDetails array
+            let firstProduct = parsed_productdetails?.[0]?.product_name?.toLowerCase().trim();
+            //console.log("Original Product Name:", firstProduct);
+
+            // Extract the relevant part of the product name (e.g., "chambal" or "coromandel")
+            if (firstProduct) {
+                const match = firstProduct.match(/chambal|coromandel/i); // Match "chambal" or "coromandel" (case-insensitive)
+                firstProduct = match ? match[0].toLowerCase() : firstProduct; // Use the matched value or fallback to the original
+            }
+            //console.log("Matched Product Name:", firstProduct);
+
+            // Define product prefixes
+            const productPrefixes = {
+                chambal: "CFCL",
+                coromandel: "CIL",
+            };
+
+            // Determine the prefix based on the product name
+            const productPrefix = productPrefixes[firstProduct] || "GEN"; // Default to "GEN" if no match
+            //console.log("Product Prefix:", productPrefix);
+
+            // Find the last receipt for the selected product prefix
+            const lastReceipt = await receipt.findOne({
+                receipt_number: new RegExp(`^${productPrefix}-`, "i"),
+            })
+                .sort({ tran_date: -1 }) // Sort by latest transaction date
+                .exec();
+
+            // Determine the next counter
+            let nextCounter = 1001; // Start from 1001
+            if (lastReceipt) {
+                const lastNumber = parseInt(lastReceipt.receipt_number.split("-").pop(), 10);
+                nextCounter = lastNumber + 1;
+            }
+
+            // Generate the receipt number
+            const receiptNo = `${productPrefix}-${nextCounter}`;
+            //console.log("Generated Receipt Number:", receiptNo);
+
+            // Create a new receipt
+            const newReceipt = new receipt({
+                tran_date: new Date(),
+                receipt_number: receiptNo,
+                vendor_name: vendor_name.trim(),
+                address: address.trim(),
+                from: from ? from.trim() : "",
+                productDetails: parsed_productdetails,
+                ship_to_address1: ship_to_address1 ? ship_to_address1.trim() : "",
+                ship_to_district: ship_to_district ? ship_to_district.trim() : "",
+                transport_mode: transport_mode ? transport_mode.trim() : "",
+                supplier_name: supplier_name ? supplier_name.trim() : "",
+                mobileNo: mobileNo,
+                transport_number: transport_number ? transport_number.trim() : "",
+                transport_driver_name: transport_driver_name ? transport_driver_name.trim() : "",
+                total_freight: total_freight || 0,
+                advance_paid: advance_paid || 0,
+                to_pay: to_pay || 0,
+                sc: sc || 0,
+                hamali: hamali || 0,
+                sch: sch || 0,
+                total_balanceamount: total_balanceamount || 0,
+                topayrate: topayrate ? topayrate.trim() : 0,
+                total_amount: total_amount || 0,
+                topayamt: topayamt || 0,
+                group_id: group_id?.trim(),
+                receiver: receiver ? receiver.trim() : "",
+                checkedValues: checkedValues ? checkedValues.trim() : ""
+            });
+
+            // Save the receipt to the database
+            const savedReceipt = await newReceipt.save();
+
+            // Return success response
+            return res.status(201).json({
+                data: savedReceipt,
+                status: "success",
+                message: "Receipt Saved Successfully",
+            });
         }
-        //console.log("Matched Product Name:", firstProduct);
-
-        // Define product prefixes
-        const productPrefixes = {
-            chambal: "CFCL",
-            coromandel: "CIL",
-        };
-
-        // Determine the prefix based on the product name
-        const productPrefix = productPrefixes[firstProduct] || "GEN"; // Default to "GEN" if no match
-        //console.log("Product Prefix:", productPrefix);
-
-        // Find the last receipt for the selected product prefix
-        const lastReceipt = await receipt.findOne({
-            receipt_number: new RegExp(`^${productPrefix}-`, "i"),
-        })
-            .sort({ tran_date: -1 }) // Sort by latest transaction date
-            .exec();
-
-        // Determine the next counter
-        let nextCounter = 1001; // Start from 1001
-        if (lastReceipt) {
-            const lastNumber = parseInt(lastReceipt.receipt_number.split("-").pop(), 10);
-            nextCounter = lastNumber + 1;
-        }
-
-        // Generate the receipt number
-        const receiptNo = `${productPrefix}-${nextCounter}`;
-        //console.log("Generated Receipt Number:", receiptNo);
-
-        // Create a new receipt
-        const newReceipt = new receipt({
-            tran_date: new Date(),
-            receipt_number: receiptNo,
-            vendor_name: vendor_name.trim(),
-            address: address.trim(),
-            from: from ? from.trim() : "",
-            productDetails: parsed_productdetails,
-            ship_to_address1: ship_to_address1 ? ship_to_address1.trim() : "",
-            ship_to_district: ship_to_district ? ship_to_district.trim() : "",
-            transport_mode: transport_mode ? transport_mode.trim() : "",
-            supplier_name: supplier_name ? supplier_name.trim() : "",
-            mobileNo: mobileNo,
-            transport_number: transport_number ? transport_number.trim() : "",
-            transport_driver_name: transport_driver_name ? transport_driver_name.trim() : "",
-            total_freight: total_freight || 0,
-            advance_paid: advance_paid || 0,
-            to_pay: to_pay || 0,
-            sc: sc || 0,
-            hamali: hamali || 0,
-            sch: sch || 0,
-            total_balanceamount: total_balanceamount || 0,
-            topayrate: topayrate ? topayrate.trim() : 0,
-            total_amount: total_amount || 0,
-            topayamt: topayamt || 0,
-            group_id: group_id?.trim(),
-            receiver: receiver ? receiver.trim() : "",
-            checkedValues: checkedValues ? checkedValues.trim() : ""
-        });
-
-        // Save the receipt to the database
-        const savedReceipt = await newReceipt.save();
-
-        // Return success response
-        return res.status(201).json({
-            data: savedReceipt,
-            status: "success",
-            message: "Receipt Saved Successfully",
-        });
     } catch (error) {
         //console.error("Error saving receipt:", error.message);
         return res.status(500).json({
             status: "error",
-            message: "Something went wrong while saving the receipt",
+            message: "Something went wrong while saving the Lorry receipt",
         });
     }
 };
 
 exports.getallusers = async (req, res) => {
+
     const fromDate = req.query.fromDate ? new Date(req.query.fromDate) : null;
     const toDate = req.query.toDate ? new Date(req.query.toDate) : null;
 
@@ -243,6 +186,7 @@ exports.getallusers = async (req, res) => {
         }
 
         const allusers = await receipt.find(query).sort({ createdAt: -1 });
+        // console.log("allusers", allusers);
 
         return res.status(201).json({
             data: allusers,
@@ -292,11 +236,59 @@ exports.getallinfo = async (req, res) => {
 
 
 
+// exports.getallreceipts = async (req, res) => {
+//     try {
+//         const { filterType, groupId } = req.params; // Get filterType & groupId from request
+//         // //console.log("filterType", filterType);
+//         // //console.log("groupId", groupId);
+
+//         if (!filterType || !groupId) {
+//             return res.status(400).json({ error: "Filter Type and Group ID are required!" });
+//         }
+
+//         let groupFormat;
+//         if (filterType === "today") {
+//             groupFormat = { $dateToString: { format: "%Y-%m-%d", date: "$tran_date" } }; // Group by Date (YYYY-MM-DD)
+//         } else if (filterType === "week") {
+//             groupFormat = { $isoWeek: "$tran_date" }; // Group by Week Number
+//         } else if (filterType === "month") {
+//             groupFormat = { $dateToString: { format: "%Y-%m", date: "$tran_date" } }; // Group by Month (YYYY-MM)
+//         } else if (filterType === "year") {
+//             groupFormat = { $year: "$tran_date" }; // Group by Year
+//         } else {
+//             return res.status(400).json({ error: "Invalid filter type!" });
+//         }
+
+//         // 📌 MongoDB Aggregation Query
+//         const result = await receipt.aggregate([
+//             { $match: { group_id: groupId } }, // 🔍 Match group ID
+//             {
+//                 $group: {
+//                     _id: groupFormat,
+//                     count: { $sum: 1 },
+//                 },
+//             },
+//             { $sort: { _id: 1 } }, // 📅 Sort by date
+//         ]);
+
+//         // 📌 Format Data for Chart
+//         const formattedData = result.map((item) => ({
+//             label: item._id.toString(), // X-Axis (Date, Week, Month, Year)
+//             value: item.count, // Y-Axis (Receipt Count)
+//         }));
+//         // //console.log("formattedData",formattedData);
+
+//         res.json({ filterType, groupId, data: formattedData });
+//     } catch (error) {
+//         //console.error("Error fetching LR receipt count:", error);
+//         res.status(500).json({ error: "Internal server error" });
+//     }
+// };
+
+
 exports.getallreceipts = async (req, res) => {
     try {
         const { filterType, groupId } = req.params; // Get filterType & groupId from request
-        // //console.log("filterType", filterType);
-        // //console.log("groupId", groupId);
 
         if (!filterType || !groupId) {
             return res.status(400).json({ error: "Filter Type and Group ID are required!" });
@@ -317,7 +309,12 @@ exports.getallreceipts = async (req, res) => {
 
         // 📌 MongoDB Aggregation Query
         const result = await receipt.aggregate([
-            { $match: { group_id: groupId } }, // 🔍 Match group ID
+            {
+                $match: {
+                    group_id: groupId,
+                    deleted: { $ne: true } // Exclude receipts where deleted is true
+                }
+            }, // 🔍 Match group ID and exclude deleted receipts
             {
                 $group: {
                     _id: groupFormat,
@@ -332,17 +329,13 @@ exports.getallreceipts = async (req, res) => {
             label: item._id.toString(), // X-Axis (Date, Week, Month, Year)
             value: item.count, // Y-Axis (Receipt Count)
         }));
-        // //console.log("formattedData",formattedData);
 
         res.json({ filterType, groupId, data: formattedData });
     } catch (error) {
-        //console.error("Error fetching LR receipt count:", error);
+        console.error("Error fetching LR receipt count:", error);
         res.status(500).json({ error: "Internal server error" });
     }
 };
-
-
-
 
 exports.regenerateReceipt = async (req, res) => {
     try {
@@ -458,9 +451,15 @@ exports.stockout = async (req, res) => {
 exports.deleteReceipt = async (req, res) => {
     try {
         // console.log("Deleting Product ID:", req.params.id);
+       
 
-        const deletedProduct = await receipt.findByIdAndDelete(req.params.id);
+        // const deletedProduct = await receipt.findByIdAndDelete(req.params.id);
+        const deletedProduct = await receipt.findByIdAndUpdate(
+            req.params.id,
 
+            { $set: { deleted: true, deletedAt: new Date() }, deleted_By: req.param.user }, // Set the deleted flag to true
+            { new: true } // Return the updated document
+        );
         if (!deletedProduct) {
             return res.status(404).json({ message: "LR not found!" });
         }

@@ -31,15 +31,16 @@ const Sheet = () => {
   console.log("data", data);
 
   const [products, setProducts] = useState([]);
-  //console.log(products);
+  console.log(products);
 
   const fetchProducts = async () => {
     if (params?.id) {
 
       try {
         const response = await axios.get(`${BASEURL}/products/${params?.id}`);
+        const activeProducts = response?.data?.products?.filter(product => product.active === true);
 
-        setProducts(response?.data?.products);
+        setProducts(activeProducts);
       } catch (error) {
         ////console.error("Error fetching products:", error);
       }
@@ -61,7 +62,10 @@ const Sheet = () => {
         `${BASEURL}/getallusers/${params.id}?${queryParams.toString()}`
       );
 
-      setData(response.data.data);
+      // setData(response.data.data);
+      const filteredData = response.data.data.filter(user => !user.deleted);
+
+      setData(filteredData);
       localStorage.setItem("count", JSON.stringify(response.data));
     } catch (err) {
       console.error("Error fetching users:", err);
@@ -81,14 +85,14 @@ const Sheet = () => {
     { field: "id", headerName: "S.N.", minWidth: 50, flex: 1 },
     { field: "Date", headerName: "Date", minWidth: 100, flex: 0.5 },
     { field: "receipt_number", headerName: "LR No.", minWidth: 100, flex: 1 },
-    { field: "vendor_name", headerName: "Name of Consignor", minWidth: 150, flex: 1 },
+    { field: "vendor_name", headerName: "Name of Consignor", minWidth: 200, flex: 2 },
     { field: "address", headerName: "Address", minWidth: 150, flex: 2 },
-    { field: "supplier_name", headerName: "Consignee Name", minWidth: 150, flex: 1 },
-    { field: "ship_to_address1", headerName: "Place", minWidth: 100, flex: 1 },
+    { field: "supplier_name", headerName: "Consignee Name", minWidth: 200, flex: 2 },
+    { field: "ship_to_address1", headerName: "Place", minWidth: 150, flex: 1 },
     { field: "ship_to_district", headerName: "District", minWidth: 120, flex: 1 },
     { field: "mobileNo", headerName: "Mobile No.", minWidth: 150, flex: 1 },
 
-    { field: "from", headerName: "From", minWidth: 120, flex: 1 },
+    { field: "from", headerName: "From", minWidth: 200, flex: 2 },
 
     { field: "transport_driver_name", headerName: "Driver Name", minWidth: 150, flex: 1 },
     { field: "transport_number", headerName: "Transport Number", minWidth: 150, flex: 1 },
@@ -264,6 +268,7 @@ const Sheet = () => {
 
 
     { field: "total_balanceamount", headerName: "Total Balance Amount", minWidth: 200, flex: 1 },
+    { field: "sc", headerName: "Advance Cash (Rs.)", minWidth: 180, flex: 1.5 },
     { field: "hamali", headerName: "Diesel (Rs.)", minWidth: 150, flex: 1 },
     { field: "topayamt", headerName: "To Pay ", minWidth: 150, flex: 1 },
     { field: "total_amount", headerName: "Total Amount", minWidth: 150, flex: 1 },
@@ -291,14 +296,14 @@ const Sheet = () => {
       productDetails: item.productDetails || [],
       checkedValues: item.checkedValues || "NA",
       from: item.from || "NA",
-      total_freight: item.total_freight || "NA",
-      total_balanceamount: item.total_balanceamount || "NA",
-      hamali: item.hamali || "NA",
+      total_freight: item.total_freight || "0",
+      total_balanceamount: item.total_balanceamount || "0",
+      hamali: item.hamali || "0",
       mobileNo: item.mobileNo || "NA",
-      topayamt: item.topayamt || "NA",
-      total_amount: item.total_amount || "NA",
-      topayrate: item.topayrate || "NA",
-
+      topayamt: item.topayamt || "0",
+      total_amount: item.total_amount || "0",
+      topayrate: item.topayrate || "0",
+      sc: item?.sc || "0"
 
     };
   }) || [];

@@ -81,7 +81,7 @@ router.get("/getallusers/:id", getallusers);
 router.get("/getsingleusers/:id", getsingleusers);
 router.patch("/update/:id", update);
 router.patch("/deactivate/:id", deactivate);
-router.delete("/lrdelete/:id", deleteReceipt);
+router.patch("/lrdelete/:id/:user", deleteReceipt);
 
 
 // router.put('/update_user_metadata',  update_user_metadata);

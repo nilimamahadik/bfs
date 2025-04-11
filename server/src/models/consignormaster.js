@@ -11,6 +11,8 @@ const ConsignorSchema = new mongoose.Schema({
     mobileNo: { type: mongoose.Schema.Types.Mixed, default: "" },    
     maplocation: { type: String },
     group_id: { type: String, trim: true },
+    active: {type: Boolean, default:true},
+
 }, { timestamps: true });
 
 module.exports = mongoose.model("consignormaster", ConsignorSchema);

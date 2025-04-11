@@ -41,7 +41,7 @@ const Poster = forwardRef((props, ref) => {
   //console.log(param);
   const componentsPDF = useRef();
   const [data, setData] = useState({});
-  //console.log(data);
+  console.log(data);
   const [open, setOpen] = useState(false); // Modal state
   const [products, setProducts] = useState([]);
   //console.log(products);
@@ -81,8 +81,8 @@ const Poster = forwardRef((props, ref) => {
       try {
         const response = await axios.get(`${BASEURL}/products/${params?.id}`);
         //console.log(response);
-
-        setProducts(response?.data?.products);
+        const activeProducts = response?.data?.products?.filter(product => product.active === true);
+        setProducts(activeProducts);
       } catch (error) {
         //////console.error("Error fetching products:", error);
       }
@@ -298,7 +298,8 @@ const Poster = forwardRef((props, ref) => {
                 )}
                 {columns.articles && (
                   <th style={{ border: "1px solid black", fontWeight: "bold", color: "black" }}>
-                    Per Bag Weight (kg)
+                    Bag / Weight (kg)
+
                   </th>
                 )}
                 {columns.weight && (
@@ -306,9 +307,11 @@ const Poster = forwardRef((props, ref) => {
                     No. of Bags
                   </th>
                 )}
-                <th style={{ border: "1px solid black", fontWeight: "bold", color: "black" }}>
-                  MT
-                </th>
+                {columns.mt && (
+                  <th style={{ border: "1px solid black", fontWeight: "bold", color: "black" }}>
+                    Metric Ton (MT)
+                  </th>
+                )}
               </tr>
             </thead>
             <tbody>
@@ -329,16 +332,18 @@ const Poster = forwardRef((props, ref) => {
                       {product.weight || "NA"}
                     </td>
                   )}
-                  <td style={{ padding: "4px", border: "1px solid black" }}>
-                    {product?.mt || "NA"}
-                  </td>
+                  {columns.mt && (
+
+                    <td style={{ padding: "4px", border: "1px solid black" }}>
+                      {product?.mt || "NA"}
+                    </td>
+                  )}
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
-
-        <div style={{ marginTop: "2px" }} >
+        <div style={{ marginTop: "2px" }}>
           <div><strong>Advance Cash:</strong> ₹ {formatIndianCurrency(data.sc) || "NA"}</div>
           <div><strong>Diesel:</strong> ₹ {formatIndianCurrency(data.hamali) || "NA"} </div>
           <div>
@@ -348,17 +353,19 @@ const Poster = forwardRef((props, ref) => {
               : "Zero Rupees Only"}
           </div>
 
-
+          <Divider
+            sx={{
+              mb: 1,
+              mt: 1,
+              borderColor: "#444", // Darker divider color
+              borderWidth: "1.5px", // Slightly thicker divider
+            }}
+          />
         </div>
 
-        <Divider
-          sx={{
-            mb: 1,
-            mt: 1,
-            borderColor: "#444", // Darker divider color
-            borderWidth: "1.5px", // Slightly thicker divider
-          }}
-        />
+
+
+
         <div> <strong>Terms and Conditions </strong> </div>
         <div variant="body2" component="ul" align="left" style={{ listStylePosition: "inside", paddingLeft: 0 }}>
           <li>
@@ -398,8 +405,8 @@ const Poster = forwardRef((props, ref) => {
           </Box>
 
 
-          <TranslateButton targetId="content-to-translate" />
-        
+          {/* <TranslateButton targetId="content-to-translate" /> */}
+
         </Box>
 
       </div>
@@ -417,10 +424,10 @@ const Poster = forwardRef((props, ref) => {
               top: "50%",
               left: "50%",
               transform: "translate(-50%, -50%)",
-              width: 450, // Slightly wider for better spacing
+              width: 400, // Slightly wider for better spacing
               bgcolor: "background.paper",
               boxShadow: 24,
-              p: 2,
+              p: 1,
               borderRadius: 3, // Rounded corners
               border: "1px solid #ccc", // Subtle border for better visibility
             }}
@@ -465,13 +472,22 @@ const Poster = forwardRef((props, ref) => {
                         }}
                       />
                     }
-                    label={key.charAt(0).toUpperCase() + key.slice(1)} // Capitalize the first letter
+                    label={
+                      key === "articles"
+                        ? "Bag / Weight (kg)"
+                        : key === "weight"
+                          ? "No. of Bags"
+                          : key.charAt(0).toUpperCase() + key.slice(1)
+                    }
+
                     sx={{
                       fontSize: "14px", // Slightly smaller font for labels
                       color: "#333", // Darker text color
                     }}
                   />
                 ))}
+
+
             </Box>
             <Box sx={{ textAlign: "center", mt: 4 }}>
               <Button

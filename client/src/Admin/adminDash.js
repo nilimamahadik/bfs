@@ -333,7 +333,6 @@ const AdminDashboard = () => {
           marginTop: "20px",
         }}
       >
-        {/* Title on the Left */}
         <Col xs={24} sm={12}>
           <Typography.Title
             level={2}
@@ -348,7 +347,6 @@ const AdminDashboard = () => {
           </Typography.Title>
         </Col>
 
-        {/* Title on the Right (Responsive) */}
         <Col xs={24} sm={12} style={{ display: "flex", justifyContent: "flex-end" }}>
           <Typography.Title
             level={2}
@@ -428,7 +426,7 @@ const AdminDashboard = () => {
         </PieChart>
 
       </div>
-      <br />
+    
 
       <Table
         dataSource={dataSource}
@@ -436,7 +434,7 @@ const AdminDashboard = () => {
         pagination={false}
         bordered={false}
         rowClassName={() => 'custom-row'}
-        style={{ marginTop: 24 }}
+        style={{ marginTop: 20, width: "50%"}} // Adjust width and background color
       />
 
     </>

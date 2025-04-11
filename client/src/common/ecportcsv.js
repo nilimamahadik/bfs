@@ -24,6 +24,8 @@ const ExportCSV = ({ data, products }) => {
     { label: "Total Freight", key: "total_freight" },
     { label: "Delivery Type", key: "checkedValues" },
     { label: "Total Balance Amount", key: "total_balanceamount" },
+    { label: "Advance Cash (Rs.)", key: "sc" },
+
     { label: "Diesel (Rs.)", key: "hamali" },
     { label: "To Pay ", key: "topayamt" },
     { label: "Total Amount", key: "total_amount" },
@@ -40,7 +42,7 @@ const ExportCSV = ({ data, products }) => {
 
   const formattedData = data.map((item, index) => ({
     id: index + 1,
-    Date: formatDate(item.createdAt) || "NA",
+    Date: item.Date || "NA",
     receipt_number: item.receipt_number || "NA",
     supplier_name: item.supplier_name || "NA",
     vendor_name: item.vendor_name || "NA",
@@ -59,12 +61,13 @@ const ExportCSV = ({ data, products }) => {
     total_freight: item.productDetails?.map((p) => p.total_freight).join(", ") || "",
     checkedValues: item.checkedValues || "NA",
     from: item.from || "NA",
-    total_balanceamount: item.total_balanceamount || "NA",
-    hamali: item.hamali || "NA",
+    total_balanceamount: item.total_balanceamount || "0",
+    hamali: item.hamali || "0",
     mobileNo: item.mobileNo || "NA",
-    topayamt: item.topayamt || "NA",
-    total_amount: item.total_amount || "NA",
-    topayrate: item.topayrate || "NA",
+    topayamt: item.topayamt || "0",
+    total_amount: item.total_amount || "0",
+    topayrate: item.topayrate || "0",
+    sc: item.sc || "0"
   }));
 
   return (
