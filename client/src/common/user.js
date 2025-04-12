@@ -302,19 +302,19 @@ const FormExample = (props) => {
       ),
     },
     { field: "checkedValues", headerName: "Delivery Type", minWidth: 150, flex: 1 },
-    {
-      field: "actions",
-      headerName: "Actions",
+    // {
+    //   field: "actions",
+    //   headerName: "Actions",
 
-      renderCell: (params) => (
-        // console.log("params", params.row),
+    //   renderCell: (params) => (
+    //     // console.log("params", params.row),
 
-        <Space style={{ padding: "7px" }}>
-          <EditOutlined onClick={() => handleEdit(params.row)} size={30} />
+    //     <Space style={{ padding: "7px" }}>
+    //       <EditOutlined onClick={() => handleEdit(params.row)} size={30} />
 
-        </Space>
-      ),
-    },
+    //     </Space>
+    //   ),
+    // },
 
     // {
     //   field: "regenerate",
@@ -392,7 +392,7 @@ const FormExample = (props) => {
           <MdArrowBack />     Lorry Receipt
         </Typography.Title>
         <div style={{ marginRight: "30px" }}>
-          <Button variant="contained" type="submit" style={{ marginRight: "10px" }} onClick={handleGraceMarks} startIcon={<IoMdAdd />} >   Generate   </Button>
+          <Button variant="contained" type="submit" style={{ marginRight: "10px", backgroundColor: "rgb(170, 43, 29)", padding: "4px 8px" }} onClick={handleGraceMarks} startIcon={<IoMdAdd />} >   Generate   </Button>
 
         </div>
       </div>

@@ -41,7 +41,7 @@ const Poster = forwardRef((props, ref) => {
   //console.log(param);
   const componentsPDF = useRef();
   const [data, setData] = useState({});
-  console.log(data);
+  //console.log(data);
   const [open, setOpen] = useState(false); // Modal state
   const [products, setProducts] = useState([]);
   //console.log(products);

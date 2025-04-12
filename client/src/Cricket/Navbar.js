@@ -11,7 +11,7 @@ import MenuIcon from "@material-ui/icons/Menu";
 import { useNavigate } from "react-router-dom";
 
 const useStyle = makeStyles((theme) => {
-  console.log("STYLE", theme);
+  //console.log("STYLE", theme);
 });
 
 const Navbar = () => {

@@ -200,7 +200,7 @@ const UploadData = (props) => {
       // 	setLoader(false);
       // }
     } catch (error) {
-      console.log(error.message);
+      //console.log(error.message);
       toast.error("error at creating");
       setLoader(false);
     }
@@ -225,7 +225,7 @@ const UploadData = (props) => {
   const onFinishFailed = (errorInfo) => {
     setLoader(false);
     toast.error("Something went wrong !");
-    console.log("Failed:", errorInfo);
+    //console.log("Failed:", errorInfo);
   };
 
   const handelChange = ({ fileList }) => {

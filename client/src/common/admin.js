@@ -54,7 +54,7 @@ const FormExampleAdmin = (props) => {
   const [receipt, setReceipt] = useState([]);
   const { Title } = Typography;
   const [value, setValue] = useState({})
-  console.log(value);
+  //console.log(value);
 
   const navigate = useNavigate();
   const [graceOpen, setGraceOpen] = useState(false)
@@ -95,7 +95,7 @@ const FormExampleAdmin = (props) => {
 
     const get = axios.get(`${BASEURL}/getallusers/${params.id}`)
       .then((res) => {
-        console.log(res);
+        //console.log(res);
         const filteredData = res.data.data.filter(user => !user.deleted);
         setData(filteredData);
         localStorage.setItem("count", JSON.stringify(res.data));
@@ -143,25 +143,6 @@ const FormExampleAdmin = (props) => {
 
   }, []);
 
-  const handleSaveEdit = async () => {
-    try {
-      const values = await modalForm.validateFields(); // Validate the form fields
-
-      // Send the updated data to the server
-      await axios.patch(`${BASEURL}/update_receipt/${editingReceipt}`, values);
-
-      alert("Lorry Receipt updated successfully!");
-      setEditModalOpen(false); // Close the modal
-      getallusers(); // Refresh the data
-      setData((prevData) =>
-        prevData.map((item) =>
-          item.record_id === editingReceipt ? { ...item, ...values } : item
-        )
-      );
-    } catch (error) {
-      message.error("Failed to update receipt.");
-    }
-  };
 
   const handleGraceMarks = () => {
     setGraceOpen(true)
@@ -203,6 +184,7 @@ const FormExampleAdmin = (props) => {
       message.error("Failed to delete Lorry receipt!");
     }
   };
+
 
   const columns = [
     { field: "id", headerName: "S.N.", minWidth: 50, flex: 1, pinned: "left" },
@@ -356,7 +338,7 @@ const FormExampleAdmin = (props) => {
         <BiRefresh
           color="#495057"
           size={25}
-          onClick={() => handleGraceMarks(params.row.record_id)}
+          onClick={() => handleGraceMarks(params.row.doc)}
         />
       ),
     },

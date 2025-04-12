@@ -4,8 +4,7 @@ import Modal from "@mui/material/Modal";
 import Box from "@mui/material/Box";
 import React, { useEffect, useState } from "react";
 import Swal from "sweetalert2";
-import './poster.css'
-
+import './poster.css';
 import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Error, ErrorOutline } from '@mui/icons-material';
@@ -88,7 +87,7 @@ const FormDataInfo = ({
     };
 
     useEffect(() => {
-        console.log(record);
+        //console.log(record);
         if (record) {
             setCheckedValues([record.checkedValues])
 
@@ -184,7 +183,7 @@ const FormDataInfo = ({
 
 
     const onFinish = async (values) => {
-        console.log(checkedValues)
+        //console.log(checkedValues)
         if (checkedValues?.length === 0) {
             alert("Please select FOR or Ex!")
         }
@@ -222,6 +221,8 @@ const FormDataInfo = ({
                 // formData.append("receipt_number", record.receipt_number)
 
             }
+            // console.log(...formData.entries());
+            
             try {
                 const response = await axios.post(`${BASEURL}/submit`, formData);
                 //console.log(response);

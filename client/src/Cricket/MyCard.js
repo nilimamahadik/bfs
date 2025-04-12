@@ -18,7 +18,7 @@ import {
 import { getMatchDetail } from "./api";
 
 const MyCard = ({ match }) => {
-  console.log(match);
+  //console.log(match);
 
   return (
     <div>

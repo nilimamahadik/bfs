@@ -23,20 +23,20 @@ export const adminlogin = (obj) => {
         return response;
       })
       .catch((err) => {
-        console.log("Error", err.response.data.message);
+        //console.log("Error", err.response.data.message);
         return err.response;
       });
   };
 
   export const monthJob = (obj) => {
-    // console.log(monthJob);
+    // //console.log(monthJob);
     return axios
       .get("/admin/allShops")
       .then((response) => {
         return response;
       })
       .catch((err) => {
-        console.log("Error", err.response.data.message);
+        //console.log("Error", err.response.data.message);
         return err.response;
       });
   };
@@ -48,20 +48,20 @@ export const adminlogin = (obj) => {
         return response;
       })
       .catch((err) => {
-        console.log("Error", err.response.data.message);
+        //console.log("Error", err.response.data.message);
         return err.response;
       });
   };
 
   export const getProfile = (obj) => {
-    // console.log(obj);
+    // //console.log(obj);
     return axios
       .get("/partner/admin/profile/" + obj.id)
       .then((response) => {
         return response;
       })
       .catch((err) => {
-        console.log("Error", err.response.data.message);
+        //console.log("Error", err.response.data.message);
         return err.response;
       });
   };
@@ -69,14 +69,14 @@ export const adminlogin = (obj) => {
 
 
   export const addDegree = (obj) => {
-    // console.log(obj);
+    // //console.log(obj);
     return axios
       .post("/adminaction", obj.data)
       .then((response) => {
         return response;
       })
       .catch((err) => {
-        console.log("Error", err.response.data.message);
+        //console.log("Error", err.response.data.message);
         return err.response;
       });
   };
@@ -88,7 +88,7 @@ export const adminlogin = (obj) => {
         return response;
       })
       .catch((err) => {
-        console.log("Error", err.response.data.message);
+        //console.log("Error", err.response.data.message);
         return err.response;
       });
   };
@@ -102,7 +102,7 @@ export const adminlogin = (obj) => {
         return response;
       })
       .catch((err) => {
-        console.log("Error", err.response.data.message);
+        //console.log("Error", err.response.data.message);
         return err.response;
       });
   };
@@ -113,7 +113,7 @@ export const adminlogin = (obj) => {
         return response;
       })
       .catch((err) => {
-        console.log("Error", err.response.data.message);
+        //console.log("Error", err.response.data.message);
         return err.response;
       });
   };
@@ -124,7 +124,7 @@ export const adminlogin = (obj) => {
         return response;
       })
       .catch((err) => {
-        console.log("Error", err.response.data.message);
+        //console.log("Error", err.response.data.message);
         return err.response;
       });
   };
@@ -138,7 +138,7 @@ export const adminlogin = (obj) => {
         return response;
       })
       .catch((err) => {
-        console.log("Error", err.response.data.message);
+        //console.log("Error", err.response.data.message);
         return err.response.data;
       });
   };
@@ -152,7 +152,7 @@ export const adminlogin = (obj) => {
         return response;
       })
       .catch((err) => {
-        console.log("Error", err.response.data.message);
+        //console.log("Error", err.response.data.message);
         return err.response;
       });
   };
@@ -164,7 +164,7 @@ export const adminlogin = (obj) => {
         return response;
       })
       .catch((err) => {
-        console.log("Error", err.response.data.message);
+        //console.log("Error", err.response.data.message);
         return err.response;
       });
   };
@@ -181,12 +181,12 @@ export const adminlogin = (obj) => {
         return response;
       })
       .catch((err) => {
-        console.log("Error", err.response.data.message);
+        //console.log("Error", err.response.data.message);
         return err.response;
       });
     //profile
     if (obj.data.profile) {
-      console.log({ profile: obj.data.profile })
+      //console.log({ profile: obj.data.profile })
       n = n.then(() => {
         return axios
           .post("/admin/" + obj.id + "/profile", obj.data.profile, {

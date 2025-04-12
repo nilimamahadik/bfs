@@ -29,7 +29,6 @@ const UserList = () => {
 
       setUserCount(res.data.activecount);
       setData(res.data.data);
-      fetchUserData();
     } catch (err) {
       //console.error("Error fetching data:", err);
       message.error("Failed to load data.");
@@ -187,7 +186,7 @@ const UserList = () => {
     },
   ];
   const rows = data.map((item, index) => (
-    console.log(item),
+    // console.log(item),
 
     {
       recordId: item._id,

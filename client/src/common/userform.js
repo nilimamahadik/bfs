@@ -1,13 +1,10 @@
-
-
 // import { MinusCircleOutlined, PlusOutlined } from '@ant-design/icons';
 // import { Dropdown, Button, Menu, Segmented, Table, Input, Spin, Form, DatePicker, Typography, Card, Col, Row, Select, Checkbox } from "antd";
 // import Modal from "@mui/material/Modal";
 // import Box from "@mui/material/Box";
 // import React, { useEffect, useState } from "react";
 // import Swal from "sweetalert2";
-// import './poster.css'
-
+// import './poster.css';
 // import axios from 'axios';
 // import { useNavigate, useParams } from 'react-router-dom';
 // import { Error, ErrorOutline } from '@mui/icons-material';
@@ -37,11 +34,13 @@
 //     const { TextArea } = Input;
 //     const { Title } = Typography;
 //     const [products, setProducts] = useState([]);
-//     ////console.log(products);
+//     //////console.log(products);
 //     const [data, setData] = useState([])
-//     //console.log(data);
+//     ////console.log(data);
 
 //     const [master, setMaster] = useState([])
+//     //console.log(master);
+
 //     const [value, setValue] = useState({})
 //     const navigate = useNavigate();
 //     const [file, setFile] = useState();
@@ -53,18 +52,22 @@
 //     // console.log(consignor);
 //     const [transport, setTransports] = useState([]);
 //     //console.log(transport);
-//     const [users, setUsers] = useState({})
+
 //     const params = useParams()
-//     ////console.log(params);
+//     //////console.log(params);
 //     const groupId = params?.id
 //     ////console.log(groupId);
 //     const [selectedConsignee, setSelectedConsignee] = useState(null);
+//     const [users, setUsers] = useState({})
 
 //     const [selectedConsignor, setSelectedConsignor] = useState(null);
 //     const [selectedTransport, setSelectedTransport] = useState(null);
 //     const [selectedProduct, setSelectedProduct] = useState(null);
 //     const [selectedProductCode, setSelectedProductCode] = useState(null);
 //     const [checkedValues, setCheckedValues] = useState([]);
+//     const [warehouse, setWarehouses] = useState([]);
+//     //console.log(warehouse);
+
 //     ////console.log(checkedValues);
 //     const [submitAction, setSubmitAction] = useState("");
 //     //console.log(submitAction);
@@ -83,23 +86,22 @@
 //         }
 //     };
 
+    // useEffect(() => {
 
-//     useEffect(() => {
+    //     const savedUser = localStorage.getItem("link");
 
-//         const savedUser = localStorage.getItem("link");
+    //     if (savedUser) {
 
-//         if (savedUser) {
+    //         const parsedUser = JSON.parse(savedUser);
 
-//             const parsedUser = JSON.parse(savedUser);
+    //         setUsers(parsedUser);
 
-//             setUsers(parsedUser);
+    //     }
+    //     else {
+    //         navigate("/");
+    //     }
 
-//         }
-//         else {
-//             navigate("/");
-//         }
-
-//     }, []);
+    // }, []);
 
 //     const fetchConsignees = async () => {
 //         try {
@@ -134,6 +136,7 @@
 //         fetchConsignees();
 //         fetchConsignors();
 //         fetchtransports();
+//         fetchWarehouses();
 //     }, []);
 
 
@@ -152,8 +155,10 @@
 
 //         const get = axios.get(`${BASEURL}/getallusers/${params.id}`)
 //             .then((res) => {
-//                 setData(res.data.data);
+//                 // setData(res.data.data);
 //                 //  // //consoleog(res.data);
+//                 const filteredData = res.data.data.filter(user => !user.deleted);
+//                 setData(filteredData);
 //                 localStorage.setItem("count", JSON.stringify(res.data));
 //             })
 //             .catch((err) => {
@@ -166,7 +171,8 @@
 
 
 //     const onFinish = async (values) => {
-//         ////console.log(values)
+//         //console.log(values)
+
 //         const userConfirmed = window.confirm(
 //             "Are you sure you want to proceed with the action?"
 //         );
@@ -186,20 +192,25 @@
 //             values.sc && formData.append("sc", values.sc)
 //             values.hamali && formData.append("hamali", values.hamali)
 //             values.sch && formData.append("sch", values.sch)
-//             formData.append("total", values.total)
+//             formData.append("total_balanceamount", values.total)
 //             formData.append("group_id", params.id)
 //             formData.append("checkedValues", checkedValues)
+//             values.topayrate && formData.append("topayrate", values.topayrate)
+//             values.sum && formData.append("total_amount", values.sum)
+//             values.topayamt && formData.append("topayamt", values.topayamt)
+
 //             try {
 //                 const response = await axios.post(`${BASEURL}/submit`, formData);
 //                 //console.log(response);
 //                 handleClose();
-//                 getallusers();
 
 //                 alert(response.data.message)
+//                 getallusers();
 
 //                 if (submitAction === "submit_print") {
 //                     navigate(`/poster/${response.data.data._id}`);
 //                 } else {
+
 //                     window.location.reload();
 //                 }
 
@@ -225,7 +236,7 @@
 
 //         updatedProducts[index] = {
 //             ...updatedProducts[index],
-//             mt: metricTon.toFixed(2), // Update the metric ton value
+//             mt: metricTon.toFixed(3),
 //         };
 
 //         modalForm.setFieldsValue({ productDetails: updatedProducts });
@@ -233,7 +244,7 @@
 //     };
 
 //     const handleValuesChange = (changedValues, allValues) => {
-//         ////console.log(allValues);
+//         //console.log(allValues);
 
 //         // Extract product details from allValues
 //         const productDetails = allValues.productDetails || [];
@@ -250,6 +261,7 @@
 //                 total_freight: totalFreight || '',
 //             };
 //         });
+//         //console.log(updatedProductDetails);
 
 //         const sumof = updatedProductDetails.reduce((sum, product) => {
 //             return sum + (parseFloat(product.mt) * parseFloat(product.rate)) || 0;
@@ -257,7 +269,17 @@
 
 //         const sc = parseFloat(allValues.sc) || 0;      // Subtract this from sumof
 //         const hamali = parseFloat(allValues.hamali) || 0;  // Add this to result
+//         const topayrate = parseFloat(allValues.topayrate) || 0; // Add this to result
+//         const totalMt = updatedProductDetails.reduce((sum, product) => {
+//             return sum + (parseFloat(product.mt) || 0);
+//         }, 0);
+//         //console.log(totalMt);
+
+//         const topayamt = topayrate * totalMt;
+//         //console.log(topayamt);
+//         // Calculate "To Pay" as topayrate * total metric tons
 //         const finalTotal = (sumof - sc) - hamali;
+//         // const topay = 
 
 //         modalForm.setFields([
 //             {
@@ -273,8 +295,8 @@
 //                 value: finalTotal || '',
 //             },
 //             {
-//                 name: 'topay',
-//                 value: finalTotal || '',
+//                 name: 'topayamt',
+//                 value: topayamt || '',
 //             },
 //         ]);
 //     };
@@ -282,10 +304,12 @@
 //     const fetchProducts = async () => {
 //         try {
 //             const response = await axios.get(`${BASEURL}/products/${params.id}`);
-//             setProducts(response?.data?.products);
+//             const activeProducts = response?.data?.products?.filter(product => product.active === true);
+//             setProducts(activeProducts);
 //         } catch (error) {
 //         }
 //     };
+    
 //     useEffect(() => {
 //         fetchProducts();
 //     }, []);
@@ -325,13 +349,30 @@
 //         });
 //     };
 //     const handleTransportChange = (value) => {
-//         console.log(value);
+//         //console.log(value);
 
 //         const selected = transport.find((item) => item._id === value);
 //         setSelectedTransport(selected);
 
 //         modalForm.setFieldsValue({
 //             from: selected?.from || "",
+//             transport_number: selected?.truckNo || "",
+//             transport_driver_name: selected?.truckDriverName || "",
+//             transport_mode: selected?.transportMode || "",
+
+
+
+//         });
+//     };
+
+//     const handleWarehouseChange = (value) => {
+//         //console.log(value);
+
+//         const selected = warehouse.find((item) => item._id === value);
+//         // setSelectedTranspor(selected);
+
+//         modalForm.setFieldsValue({
+//             from: selected?.place || "",
 //             transport_number: selected?.truckNo || "",
 //             transport_driver_name: selected?.truckDriverName || "",
 //             transport_mode: selected?.transportMode || "",
@@ -350,7 +391,14 @@
 
 //         modalForm.setFieldsValue({ sum: sumof.toFixed(2) || "0.000" }); // Update sum
 //     };
-
+//     const fetchWarehouses = async () => {
+//         try {
+//             const response = await axios.get(`${BASEURL}/getwarehouse/${groupId}`);
+//             setWarehouses(response?.data?.products);
+//         } catch (error) {
+//             // // console.error("Error fetching products:", error);
+//         }
+//     };
 //     return (
 //         <Modal
 //             open={open}
@@ -389,7 +437,7 @@
 //                     <div className='custom-container'>
 
 //                         <Row gutter={16} style={{ display: 'flex', flexWrap: 'nowrap' }}>
-//                             <Col span={12}>
+//                             <Col span={5}>
 //                                 <Form.Item style={{ marginBottom: "0px" }} name="from" label="From">
 //                                     <Select
 //                                         showSearch
@@ -398,16 +446,16 @@
 //                                         size="medium"
 //                                         style={{ width: "100%" }}
 //                                         getPopupContainer={(trigger) => trigger.parentNode}
-//                                         onChange={handleTransportChange}
+//                                         onChange={handleWarehouseChange}
 //                                     >
-//                                         {Array.isArray(transport) &&
-//                                             transport.map((item) => (
-//                                                 console.log(item),
+//                                         {Array.isArray(warehouse) &&
+//                                             warehouse.map((item) => (
+//                                                 //console.log(item),
 
 
 
-//                                                 <Select.Option key={item._id} value={item._id} label={item.from}>
-//                                                     {item.from}
+//                                                 <Select.Option key={item._id} value={item._id} label={item.place}>
+//                                                     {item.place + ',' + item.name}
 //                                                 </Select.Option>
 //                                             ))}
 
@@ -415,36 +463,40 @@
 //                                 </Form.Item>
 
 //                             </Col>
-//                             <Col span={12}>
+//                             <Col span={5}>
 //                                 <Form.Item style={{ marginBottom: "0px" }} name='transport_number' label="Truck No.">
 //                                     <Input placeholder="Enter Truck No." />
 //                                 </Form.Item>
 //                             </Col>
-//                         </Row>
-//                         <Row gutter={16} style={{ display: 'flex', flexWrap: 'nowrap' }}>
-//                             <Col span={12}>
+//                             <Col span={5}>
 //                                 <Form.Item style={{ marginBottom: "0px" }} name='transport_driver_name' label="Truck Driver Name">
 //                                     <Input placeholder="Enter Truck Driver Name" />
 //                                 </Form.Item>
 //                             </Col>
-//                             <Col span={12}>
-//                                 <Form.Item style={{ marginBottom: "0px" }} name='transport_mode' label="Transport Mode">
-//                                 <Input placeholder="Enter Transport Mode" />
-//                                     {/* <Select
+//                             <Col span={5}>
+//                                 <Form.Item
+//                                     style={{ marginBottom: "0px" }}
+//                                     name="transport_mode"
+//                                     label="Transport Mode"
+//                                     initialValue={master[0]?.transportmodename?.[0]} // Set the first option as default
+//                                 >
+//                                     <Select
 //                                         showSearch
 //                                         placeholder="Select Transport Mode"
 //                                         optionFilterProp="label"
 //                                         size="medium"
-//                                         style={{ width: '100%' }}
+//                                         style={{ width: "100%" }}
 //                                         options={master[0]?.transportmodename?.map((mode) => ({
 //                                             value: mode,
 //                                             label: mode,
 //                                         }))} // Convert array to objects
 //                                         getPopupContainer={(trigger) => trigger.parentNode}
-//                                     /> */}
-
+//                                     />
 //                                 </Form.Item>
 //                             </Col>
+//                         </Row>
+//                         <Row gutter={16} style={{ display: 'flex', flexWrap: 'nowrap' }}>
+
 //                         </Row>
 
 //                     </div>
@@ -454,7 +506,7 @@
 //                     <h6>Consignor Details</h6>
 //                     <div className='custom-container' >
 //                         <Row gutter={16} style={{ display: 'flex', flexWrap: 'nowrap' }}>
-//                             <Col span={12}>
+//                             <Col span={5}>
 //                                 <Form.Item style={{ marginBottom: "0px" }} name="vendor_name" label="Name">
 //                                     <Select
 //                                         showSearch
@@ -476,7 +528,7 @@
 //                                 </Form.Item>
 
 //                             </Col>
-//                             <Col span={12}>
+//                             <Col span={5}>
 //                                 <Form.Item style={{ marginBottom: "0px" }} name='address' label="Address">
 //                                     <Input placeholder="Enter Address" />
 //                                 </Form.Item>
@@ -487,7 +539,7 @@
 //                     <h6>Consignee Details</h6>
 //                     <div className='custom-container'>
 //                         <Row gutter={16} style={{ display: 'flex', flexWrap: 'nowrap' }}>
-//                             <Col span={12}>
+//                             <Col span={5}>
 //                                 <Form.Item style={{ marginBottom: "0px" }} name="supplier_name" label="Name of Consignee">
 //                                     <Select
 //                                         showSearch
@@ -508,20 +560,17 @@
 //                                     </Select>
 //                                 </Form.Item>
 //                             </Col>
-//                             <Col span={12}>
+//                             <Col span={5}>
 //                                 <Form.Item style={{ marginBottom: "0px" }} name='ship_to_address1' label="Place">
 //                                     <Input placeholder="Enter Place" />
 //                                 </Form.Item>
 //                             </Col>
-//                         </Row>
-
-//                         <Row gutter={16} style={{ display: 'flex', flexWrap: 'nowrap' }}>
-//                             <Col span={12}>
+//                             <Col span={5}>
 //                                 <Form.Item style={{ marginBottom: "0px" }} name='ship_to_district' label="District">
 //                                     <Input placeholder="Enter District" />
 //                                 </Form.Item>
 //                             </Col>
-//                             <Col span={12}>
+//                             <Col span={5}>
 //                                 <Form.Item
 //                                     style={{ marginBottom: "0px" }}
 //                                     name='mobileNo'
@@ -536,6 +585,8 @@
 //                                 </Form.Item>
 //                             </Col>
 //                         </Row>
+
+
 //                     </div>
 //                     <h6>Goods Details</h6>
 //                     <div className='custom-container'>
@@ -552,7 +603,7 @@
 //                                                     display: 'flex',
 //                                                     flexWrap: 'nowrap',
 //                                                     alignItems: 'flex-start',
-//                                                     marginBottom: '10px'
+
 //                                                 }}
 //                                             >
 //                                                 <Col style={{ flex: 1 }}>
@@ -698,34 +749,31 @@
 //                                                     >
 
 //                                                     </Button>
+//                                                     <Button
+//                                                         type="dashed"
+//                                                         onClick={() => {
+//                                                             add({ product_name: '', product_code: '', uom: '', weight: '', rate: '', total_freight: '' });
+//                                                             setTimeout(() => {
+//                                                                 const updatedProductDetails = modalForm.getFieldValue('productDetails') || [];
+//                                                                 const sumof = updatedProductDetails.reduce((sum, product) => {
+//                                                                     return sum + ((parseFloat(product.weight) || 0) * (parseFloat(product.rate) || 0));
+//                                                                 }, 0);
+//                                                                 modalForm.setFields([{ name: 'sum', value: sumof || '' }]);
+//                                                                 updateTotalSum();
+//                                                             }, 100); // Small delay to ensure the new row is included
+//                                                         }}
+//                                                         icon={<PlusOutlined />}
+//                                                         style={{ width: '100%', marginLeft: "3px" }}
+//                                                     >
+
+//                                                     </Button>
 //                                                 </Col>
 
 //                                             </Row>
 //                                         </div>
 //                                     ))}
 
-//                                     <Form.Item>
-//                                         <div style={{ display: 'flex', justifyContent: 'center', marginTop: '5px' }}>
-//                                             <Button
-//                                                 type="dashed"
-//                                                 onClick={() => {
-//                                                     add({ product_name: '', product_code: '', uom: '', weight: '', rate: '', total_freight: '' });
-//                                                     setTimeout(() => {
-//                                                         const updatedProductDetails = modalForm.getFieldValue('productDetails') || [];
-//                                                         const sumof = updatedProductDetails.reduce((sum, product) => {
-//                                                             return sum + ((parseFloat(product.weight) || 0) * (parseFloat(product.rate) || 0));
-//                                                         }, 0);
-//                                                         modalForm.setFields([{ name: 'sum', value: sumof || '' }]);
-//                                                         updateTotalSum();
-//                                                     }, 100); // Small delay to ensure the new row is included
-//                                                 }}
-//                                                 icon={<PlusOutlined />}
-//                                                 style={{ width: '100%' }}
-//                                             >
-//                                                 Add Product Details
-//                                             </Button>
-//                                         </div>
-//                                     </Form.Item>
+
 //                                 </>
 //                             )}
 //                         </Form.List>
@@ -734,33 +782,37 @@
 
 
 
-//                     <Col style={{ flex: 1, width: "20%" }}>
-//                         <Form.Item
-//                             style={{ marginBottom: '5px' }}
-//                             name="sum"
-//                             label="Total Amount (Rs.)"
-//                         >
-//                             <Input size="medium" />
-//                         </Form.Item>
-//                     </Col>
+//                     <Row gutter={16} style={{ display: 'flex', flexWrap: 'nowrap' }}>
+//                         <Col style={{ flex: 1, width: "20%", marginTop: "10px", marginLeft: "20px" }}>
+//                             <Checkbox.Group
+//                                 options={[
+//                                     { label: "FOR", value: "FOR" },
+//                                     { label: "Ex", value: "Ex" },
+//                                 ]}
+//                                 value={checkedValues}
+//                                 onChange={onChange}
+//                             />
+//                             <p>Selected: {checkedValues.join(", ") || "None"}</p>
+//                         </Col>
 
-//                     <div style={{ marginTop: "20px" }}>
-//                         <Checkbox.Group
-//                             options={[
-//                                 { label: "FOR", value: "FOR" },
-//                                 { label: "Ex", value: "Ex" },
-//                             ]}
-//                             value={checkedValues}
-//                             onChange={onChange}
+//                         <Col span={6} style={{ flex: 1, width: "10%" }}>
+//                             <Form.Item
+//                                 style={{ marginBottom: '5px', marginRight: "80px" }}
+//                                 name="sum"
+//                                 label="Total Amount (Rs.)"
+//                             >
+//                                 <Input size="medium" placeholder="Enter Total Amount" />
+//                             </Form.Item>
+//                         </Col>
 
-//                         />
+//                     </Row>
 
-//                         <p>Selected: {checkedValues.join(", ") || "None"}</p>
-//                     </div>
 
 //                     <Row gutter={16} style={{ display: 'flex', flexWrap: 'nowrap' }}>
+
+
 //                         {/* Student Name */}
-//                         <Col span={6}>
+//                         <Col span={4}>
 //                             <Form.Item
 //                                 style={{ marginBottom: "0px" }}
 //                                 name='sc'
@@ -771,7 +823,7 @@
 //                         </Col>
 
 //                         {/* Roll Number */}
-//                         <Col span={6}>
+//                         <Col span={4}>
 //                             <Form.Item
 //                                 style={{ marginBottom: "0px" }}
 //                                 name='hamali'
@@ -783,7 +835,7 @@
 
 
 //                         {/* Roll Number */}
-//                         <Col span={6}>
+//                         <Col span={4}>
 //                             <Form.Item
 //                                 style={{ marginBottom: "0px" }}
 //                                 name='total'
@@ -793,22 +845,36 @@
 //                             </Form.Item>
 //                         </Col>
 //                         {checkedValues.includes("Ex") && (
-//                             <Col span={6}>
-//                                 <Form.Item
-//                                     style={{ marginBottom: "0px" }}
-//                                     name="topay"
-//                                     label="To Pay (Rs.)"
-//                                 >
-//                                     <Input size="medium" placeholder="Enter To Pay" />
-//                                 </Form.Item>
-//                             </Col>
+//                             <>
+//                                 <Col span={4}>
+//                                     <Form.Item
+//                                         style={{ marginBottom: "0px" }}
+//                                         name="topayrate"
+//                                         label="Rate"
+//                                     >
+//                                         <Input
+//                                             size="medium"
+//                                             placeholder="Enter Rate"
+//                                             onChange={() => handleValuesChange({}, modalForm.getFieldsValue())} // Trigger recalculation on change
+//                                         />
+//                                     </Form.Item>
+//                                 </Col>
+//                                 <Col span={4}>
+
+
+//                                     <Form.Item
+//                                         name="topayamt"
+//                                         label="To Pay (Rs.)"
+//                                     >
+//                                         <Input size="medium" placeholder="Enter To Pay" />
+//                                     </Form.Item>
+
+//                                 </Col>
+//                             </>
 //                         )}
+
 //                     </Row>
 //                     <hr />
-
-
-
-
 //                     <Form.Item
 //                         style={{ marginBottom: "15px" }}
 //                         wrapperCol={{
@@ -858,8 +924,7 @@ import Modal from "@mui/material/Modal";
 import Box from "@mui/material/Box";
 import React, { useEffect, useState } from "react";
 import Swal from "sweetalert2";
-import './poster.css'
-
+import './poster.css';
 import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Error, ErrorOutline } from '@mui/icons-material';
@@ -878,6 +943,7 @@ const FormDataInfoUser = ({
     loader,
     setLoader,
     modalForm,
+    record,
     filteredExam,
     selectedSubject,
     selectedBranch,
@@ -913,7 +979,6 @@ const FormDataInfoUser = ({
     const groupId = params?.id
     ////console.log(groupId);
     const [selectedConsignee, setSelectedConsignee] = useState(null);
-    const [users, setUsers] = useState({})
 
     const [selectedConsignor, setSelectedConsignor] = useState(null);
     const [selectedTransport, setSelectedTransport] = useState(null);
@@ -922,7 +987,7 @@ const FormDataInfoUser = ({
     const [checkedValues, setCheckedValues] = useState([]);
     const [warehouse, setWarehouses] = useState([]);
     //console.log(warehouse);
-
+    const [users, setUsers] = useState({})
     ////console.log(checkedValues);
     const [submitAction, setSubmitAction] = useState("");
     //console.log(submitAction);
@@ -933,13 +998,28 @@ const FormDataInfoUser = ({
         const lastSelected = checkedList[checkedList.length - 1];
         setCheckedValues(lastSelected ? [lastSelected] : []);
 
-        // Check if "For" is selected and set "total" accordingly
-        if (lastSelected === "FOR") {
-            modalForm.setFieldsValue({ total: "0.00" });
-        } else {
-            modalForm.setFieldsValue({ total: "" }); // Reset when unchecked or "Ex" is selected
-        }
+        // // Check if "For" is selected and set "total" accordingly
+        // if (lastSelected === "FOR") {
+        //     modalForm.setFieldsValue({ total: "0.00" });
+        // } else {
+        //     modalForm.setFieldsValue({ total: "" }); // Reset when unchecked or "Ex" is selected
+        // }
     };
+
+    useEffect(() => {
+        //console.log(record);
+        if (record) {
+            setCheckedValues([record.checkedValues])
+
+            modalForm.setFieldsValue({
+                ...record,
+                sum: record.total_amount,
+                total: record.total_balanceamount,
+            })
+        }
+
+    }, [record]);
+
 
     useEffect(() => {
 
@@ -1010,10 +1090,12 @@ const FormDataInfoUser = ({
 
         const get = axios.get(`${BASEURL}/getallusers/${params.id}`)
             .then((res) => {
+
+                const filteredData = res.data.data.filter(user => !user.deleted);
+
+                setData(filteredData);
                 // setData(res.data.data);
                 //  // //consoleog(res.data);
-                const filteredData = res.data.data.filter(user => !user.deleted);
-                setData(filteredData);
                 localStorage.setItem("count", JSON.stringify(res.data));
             })
             .catch((err) => {
@@ -1026,7 +1108,12 @@ const FormDataInfoUser = ({
 
 
     const onFinish = async (values) => {
-        //console.log(values)
+        //console.log(checkedValues)
+        if (checkedValues?.length === 0) {
+            alert("Please select FOR or Ex!")
+        }
+        // cole.log(values)
+
 
         const userConfirmed = window.confirm(
             "Are you sure you want to proceed with the action?"
@@ -1053,7 +1140,14 @@ const FormDataInfoUser = ({
             values.topayrate && formData.append("topayrate", values.topayrate)
             values.sum && formData.append("total_amount", values.sum)
             values.topayamt && formData.append("topayamt", values.topayamt)
+            // record && formData.append("update", record._id)
+            if (record) {
+                formData.append("update", record._id)
+                // formData.append("receipt_number", record.receipt_number)
 
+            }
+            // console.log(...formData.entries());
+            
             try {
                 const response = await axios.post(`${BASEURL}/submit`, formData);
                 //console.log(response);
@@ -1134,7 +1228,7 @@ const FormDataInfoUser = ({
         //console.log(topayamt);
         // Calculate "To Pay" as topayrate * total metric tons
         const finalTotal = (sumof - sc) - hamali;
-        // const topay = 
+
 
         modalForm.setFields([
             {
@@ -1143,15 +1237,15 @@ const FormDataInfoUser = ({
             },
             {
                 name: 'sum',
-                value: sumof || '',
+                value: sumof || '0.000',
             },
             {
                 name: 'total',
-                value: finalTotal || '',
+                value: finalTotal || '0.000',
             },
             {
                 name: 'topayamt',
-                value: topayamt || '',
+                value: topayamt || '0.000',
             },
         ]);
     };
@@ -1164,7 +1258,6 @@ const FormDataInfoUser = ({
         } catch (error) {
         }
     };
-    
     useEffect(() => {
         fetchProducts();
     }, []);
@@ -1203,22 +1296,7 @@ const FormDataInfoUser = ({
 
         });
     };
-    const handleTransportChange = (value) => {
-        //console.log(value);
 
-        const selected = transport.find((item) => item._id === value);
-        setSelectedTransport(selected);
-
-        modalForm.setFieldsValue({
-            from: selected?.from || "",
-            transport_number: selected?.truckNo || "",
-            transport_driver_name: selected?.truckDriverName || "",
-            transport_mode: selected?.transportMode || "",
-
-
-
-        });
-    };
 
     const handleWarehouseChange = (value) => {
         //console.log(value);
@@ -1292,8 +1370,10 @@ const FormDataInfoUser = ({
                     <div className='custom-container'>
 
                         <Row gutter={16} style={{ display: 'flex', flexWrap: 'nowrap' }}>
-                            <Col span={5}>
-                                <Form.Item style={{ marginBottom: "0px" }} name="from" label="From">
+                            <Col span={9}>
+                                <Form.Item style={{ marginBottom: "0px" }} name="from" label="From"
+                                    rules={[{ required: true, message: "Please select From!" }]}
+                                >
                                     <Select
                                         showSearch
                                         placeholder="Select From"
@@ -1302,6 +1382,7 @@ const FormDataInfoUser = ({
                                         style={{ width: "100%" }}
                                         getPopupContainer={(trigger) => trigger.parentNode}
                                         onChange={handleWarehouseChange}
+
                                     >
                                         {Array.isArray(warehouse) &&
                                             warehouse.map((item) => (
@@ -1319,12 +1400,16 @@ const FormDataInfoUser = ({
 
                             </Col>
                             <Col span={5}>
-                                <Form.Item style={{ marginBottom: "0px" }} name='transport_number' label="Truck No.">
+                                <Form.Item style={{ marginBottom: "0px" }} name='transport_number' label="Truck No."
+                                    rules={[{ required: true, message: "Please enter Transport number !" }]}
+                                >
                                     <Input placeholder="Enter Truck No." />
                                 </Form.Item>
                             </Col>
                             <Col span={5}>
-                                <Form.Item style={{ marginBottom: "0px" }} name='transport_driver_name' label="Truck Driver Name">
+                                <Form.Item style={{ marginBottom: "0px" }} name='transport_driver_name' label="Truck Driver Name"
+                                    rules={[{ message: "Please enter Truck Driver Name!" }]}
+                                >
                                     <Input placeholder="Enter Truck Driver Name" />
                                 </Form.Item>
                             </Col>
@@ -1334,6 +1419,7 @@ const FormDataInfoUser = ({
                                     name="transport_mode"
                                     label="Transport Mode"
                                     initialValue={master[0]?.transportmodename?.[0]} // Set the first option as default
+                                    rules={[{ required: true, message: "Please select Transport Mode!" }]}
                                 >
                                     <Select
                                         showSearch
@@ -1361,8 +1447,11 @@ const FormDataInfoUser = ({
                     <h6>Consignor Details</h6>
                     <div className='custom-container' >
                         <Row gutter={16} style={{ display: 'flex', flexWrap: 'nowrap' }}>
-                            <Col span={5}>
-                                <Form.Item style={{ marginBottom: "0px" }} name="vendor_name" label="Name">
+                            <Col span={9}>
+                                <Form.Item style={{ marginBottom: "0px" }} name="vendor_name" label="Name"
+                                    rules={[{ required: true, message: "Please select Name of Consignor!" }]}
+
+                                >
                                     <Select
                                         showSearch
                                         placeholder="Select Name of Consignor"
@@ -1384,7 +1473,8 @@ const FormDataInfoUser = ({
 
                             </Col>
                             <Col span={5}>
-                                <Form.Item style={{ marginBottom: "0px" }} name='address' label="Address">
+                                <Form.Item style={{ marginBottom: "0px" }} name='address' label="Address"
+                                    rules={[{ required: true, message: "Please enter Address!" }]}>
                                     <Input placeholder="Enter Address" />
                                 </Form.Item>
                             </Col>
@@ -1394,8 +1484,9 @@ const FormDataInfoUser = ({
                     <h6>Consignee Details</h6>
                     <div className='custom-container'>
                         <Row gutter={16} style={{ display: 'flex', flexWrap: 'nowrap' }}>
-                            <Col span={5}>
-                                <Form.Item style={{ marginBottom: "0px" }} name="supplier_name" label="Name of Consignee">
+                            <Col span={9}>
+                                <Form.Item style={{ marginBottom: "0px" }} name="supplier_name" label="Name of Consignee"
+                                    rules={[{ required: true, message: "Please select Name of Consignee!" }]}>
                                     <Select
                                         showSearch
                                         placeholder="Select Name of Consignee"
@@ -1416,12 +1507,15 @@ const FormDataInfoUser = ({
                                 </Form.Item>
                             </Col>
                             <Col span={5}>
-                                <Form.Item style={{ marginBottom: "0px" }} name='ship_to_address1' label="Place">
+                                <Form.Item style={{ marginBottom: "0px" }} name='ship_to_address1' label="Place"
+                                    rules={[{ required: true, message: "Please enter Place!" }]}>
                                     <Input placeholder="Enter Place" />
                                 </Form.Item>
                             </Col>
                             <Col span={5}>
-                                <Form.Item style={{ marginBottom: "0px" }} name='ship_to_district' label="District">
+                                <Form.Item style={{ marginBottom: "0px" }} name='ship_to_district' label="District"
+                                    rules={[{ required: true, message: "Please enter District!" }]}
+                                >
                                     <Input placeholder="Enter District" />
                                 </Form.Item>
                             </Col>
@@ -1461,12 +1555,13 @@ const FormDataInfoUser = ({
 
                                                 }}
                                             >
-                                                <Col style={{ flex: 1 }}>
+                                                <Col style={{ flex: 2 }}>
                                                     <Form.Item
                                                         {...restField}
                                                         name={[name, "product_code"]}
                                                         fieldKey={[fieldKey, "product_code"]}
                                                         label={index === 0 ? "Product Code" : null}
+                                                        rules={[{ required: true, message: "Please enter Product Code!" }]}
                                                     >
                                                         <Select
                                                             showSearch
@@ -1480,6 +1575,17 @@ const FormDataInfoUser = ({
                                                                 const selectedProduct = products.find((product) => product.code === value);
                                                                 if (selectedProduct) {
                                                                     const updatedProducts = [...modalForm.getFieldValue("productDetails")];
+
+                                                                    updatedProducts[name] = {
+                                                                        product_code: selectedProduct.code,
+                                                                        product_name: selectedProduct.name,
+                                                                        weightperbag: selectedProduct.rate || 0,
+                                                                        weight: "", // Reset weight
+                                                                        mt: "", // Reset metric ton
+                                                                        rate: "", // Reset rate
+                                                                        total_freight: "", // Reset total freight
+
+                                                                    };
                                                                     updatedProducts[name] = {
                                                                         ...updatedProducts[name],
                                                                         product_name: selectedProduct.name,
@@ -1487,6 +1593,14 @@ const FormDataInfoUser = ({
                                                                     };
 
                                                                     modalForm.setFieldsValue({ productDetails: updatedProducts });
+                                                                    modalForm.setFields([
+                                                                        { name: "sc", value: "" },
+                                                                        { name: "hamali", value: "" },
+                                                                        { name: "topayrate", value: "" },
+                                                                        { name: "topayamt", value: "" },
+                                                                        { name: "sum", value: "" },
+                                                                        { name: "total", value: "" }
+                                                                    ]);
                                                                     updateMetricTon(name);
                                                                     modalForm.validateFields([["productDetails", name, "product_code"]])
                                                                         .catch(() => { });
@@ -1558,7 +1672,7 @@ const FormDataInfoUser = ({
                                                         name={[name, 'mt']}
                                                         fieldKey={[fieldKey, 'mt']}
                                                         label={index === 0 ? 'Weight [MT]' : null} // Show label only for the first row
-                                                        rules={[{ required: false, message: 'Please enter Weight' }]}
+                                                        rules={[{ required: true, message: 'Please enter Weight' }]}
                                                     >
 
                                                         <Input size="medium" placeholder=" enter Weight" />
@@ -1583,7 +1697,6 @@ const FormDataInfoUser = ({
                                                         name={[name, 'total_freight']}
                                                         fieldKey={[fieldKey, 'total_freight']}
                                                         label={index === 0 ? 'Total Freight' : null} // Show label only for the first row
-                                                        rules={[{ required: true, message: 'Please enter Total Freight!' }]}
                                                     >
                                                         <Input size="medium" placeholder="Enter Total Freight" />
                                                     </Form.Item>
@@ -1639,15 +1752,21 @@ const FormDataInfoUser = ({
 
                     <Row gutter={16} style={{ display: 'flex', flexWrap: 'nowrap' }}>
                         <Col style={{ flex: 1, width: "20%", marginTop: "10px", marginLeft: "20px" }}>
-                            <Checkbox.Group
-                                options={[
-                                    { label: "FOR", value: "FOR" },
-                                    { label: "Ex", value: "Ex" },
-                                ]}
-                                value={checkedValues}
-                                onChange={onChange}
-                            />
-                            <p>Selected: {checkedValues.join(", ") || "None"}</p>
+                            <Form.Item
+
+                            >
+                                <Checkbox.Group
+                                    options={[
+                                        { label: "FOR", value: "FOR" },
+                                        { label: "Ex", value: "Ex" },
+                                    ]}
+                                    value={checkedValues}
+                                    onChange={onChange}
+                                />
+                                <p>Selected: {checkedValues.join(", ") || "None"}</p>
+
+                            </Form.Item>
+
                         </Col>
 
                         <Col span={6} style={{ flex: 1, width: "10%" }}>
@@ -1694,7 +1813,7 @@ const FormDataInfoUser = ({
                             <Form.Item
                                 style={{ marginBottom: "0px" }}
                                 name='total'
-                                label="Total Balance Amount (Rs.)"
+                                label="Total Balance (Rs.)"
                             >
                                 <Input size="medium" placeholder="Enter Total" />
                             </Form.Item>
@@ -1737,29 +1856,47 @@ const FormDataInfoUser = ({
                             span: 12,
                         }}
                     >
-                        {/* Submit Button */}
-                        <Button
-                            type="primary"
-                            htmlType="submit"
-                            size="medium"
-                            loading={loader}
-                            style={{ backgroundColor: "rgb(170, 43, 29)", marginRight: "10px" }}
-                            onClick={() => setSubmitAction("submit")}
-                        >
-                            Submit
-                        </Button>
 
-                        {/* Submit & Print Button */}
-                        <Button
-                            type="primary"
-                            size="medium"
-                            htmlType="submit"
-                            loading={loader}
-                            style={{ backgroundColor: "rgb(29, 128, 170)" }}
-                            onClick={() => setSubmitAction("submit_print")}
-                        >
-                            Submit & Print
-                        </Button>
+                        {record ?
+                            <Button
+                                type="primary"
+                                htmlType="submit"
+                                size="medium"
+                                loading={loader}
+                                style={{ backgroundColor: "rgb(170, 43, 29)", marginRight: "10px" }}
+                                onClick={() => setSubmitAction("submit")}
+                            >
+                                Update
+                            </Button>
+
+                            :
+                            <>
+                                <Button
+                                    type="primary"
+                                    htmlType="submit"
+                                    size="medium"
+                                    loading={loader}
+                                    style={{ backgroundColor: "rgb(170, 43, 29)", marginRight: "10px" }}
+                                    onClick={() => setSubmitAction("submit")}
+                                >
+                                    Submit
+                                </Button>
+
+                                <Button
+                                    type="primary"
+                                    size="medium"
+                                    htmlType="submit"
+                                    loading={loader}
+                                    style={{ backgroundColor: "rgb(29, 128, 170)" }}
+                                    onClick={() => setSubmitAction("submit_print")}
+                                >
+                                    Submit & Print
+                                </Button>
+                            </>
+
+                        }
+
+
                     </Form.Item>
                 </Form>
             </Box>

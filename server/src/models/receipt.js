@@ -68,7 +68,7 @@ const applySchema = new mongoose.Schema(
     total_amount: { type: Number, trim: true },
     deleted: { type: Boolean, default: false }, 
     deletedAt :{ type: Date },
-    deleted_By: { type: String, required: true },
+    deleted_By: { type: String },
   },
   { timestamps: true }
 );

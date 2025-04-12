@@ -37,9 +37,9 @@ exports.submit_form = async (req, res) => {
 
         // Parse productDetails if it's a string
         const parsed_productdetails = typeof productDetails === "string" ? JSON.parse(productDetails) : productDetails;
-        //console.log("Parsed Product Details:", parsed_productdetails);
+        // console.log("Parsed Product Details:", parsed_productdetails);
         if (update) {
-            console.log("update", update);
+            // console.log("update", update);
 
             const updatedReceipt = await receipt.findOneAndUpdate(
                 {
@@ -116,7 +116,7 @@ exports.submit_form = async (req, res) => {
 
             // Generate the receipt number
             const receiptNo = `${productPrefix}-${nextCounter}`;
-            //console.log("Generated Receipt Number:", receiptNo);
+            // console.log("Generated Receipt Number:", receiptNo);
 
             // Create a new receipt
             const newReceipt = new receipt({
@@ -150,6 +150,7 @@ exports.submit_form = async (req, res) => {
 
             // Save the receipt to the database
             const savedReceipt = await newReceipt.save();
+            // console.log(savedReceipt);
 
             // Return success response
             return res.status(201).json({
@@ -159,7 +160,7 @@ exports.submit_form = async (req, res) => {
             });
         }
     } catch (error) {
-        //console.error("Error saving receipt:", error.message);
+        console.error("Error saving receipt:", error.message);
         return res.status(500).json({
             status: "error",
             message: "Something went wrong while saving the Lorry receipt",
@@ -236,55 +237,6 @@ exports.getallinfo = async (req, res) => {
 
 
 
-// exports.getallreceipts = async (req, res) => {
-//     try {
-//         const { filterType, groupId } = req.params; // Get filterType & groupId from request
-//         // //console.log("filterType", filterType);
-//         // //console.log("groupId", groupId);
-
-//         if (!filterType || !groupId) {
-//             return res.status(400).json({ error: "Filter Type and Group ID are required!" });
-//         }
-
-//         let groupFormat;
-//         if (filterType === "today") {
-//             groupFormat = { $dateToString: { format: "%Y-%m-%d", date: "$tran_date" } }; // Group by Date (YYYY-MM-DD)
-//         } else if (filterType === "week") {
-//             groupFormat = { $isoWeek: "$tran_date" }; // Group by Week Number
-//         } else if (filterType === "month") {
-//             groupFormat = { $dateToString: { format: "%Y-%m", date: "$tran_date" } }; // Group by Month (YYYY-MM)
-//         } else if (filterType === "year") {
-//             groupFormat = { $year: "$tran_date" }; // Group by Year
-//         } else {
-//             return res.status(400).json({ error: "Invalid filter type!" });
-//         }
-
-//         // 📌 MongoDB Aggregation Query
-//         const result = await receipt.aggregate([
-//             { $match: { group_id: groupId } }, // 🔍 Match group ID
-//             {
-//                 $group: {
-//                     _id: groupFormat,
-//                     count: { $sum: 1 },
-//                 },
-//             },
-//             { $sort: { _id: 1 } }, // 📅 Sort by date
-//         ]);
-
-//         // 📌 Format Data for Chart
-//         const formattedData = result.map((item) => ({
-//             label: item._id.toString(), // X-Axis (Date, Week, Month, Year)
-//             value: item.count, // Y-Axis (Receipt Count)
-//         }));
-//         // //console.log("formattedData",formattedData);
-
-//         res.json({ filterType, groupId, data: formattedData });
-//     } catch (error) {
-//         //console.error("Error fetching LR receipt count:", error);
-//         res.status(500).json({ error: "Internal server error" });
-//     }
-// };
-
 
 exports.getallreceipts = async (req, res) => {
     try {
@@ -307,7 +259,6 @@ exports.getallreceipts = async (req, res) => {
             return res.status(400).json({ error: "Invalid filter type!" });
         }
 
-        // 📌 MongoDB Aggregation Query
         const result = await receipt.aggregate([
             {
                 $match: {
@@ -324,7 +275,6 @@ exports.getallreceipts = async (req, res) => {
             { $sort: { _id: 1 } }, // 📅 Sort by date
         ]);
 
-        // 📌 Format Data for Chart
         const formattedData = result.map((item) => ({
             label: item._id.toString(), // X-Axis (Date, Week, Month, Year)
             value: item.count, // Y-Axis (Receipt Count)
@@ -449,21 +399,20 @@ exports.stockout = async (req, res) => {
 
 
 exports.deleteReceipt = async (req, res) => {
-    try {
-        // console.log("Deleting Product ID:", req.params.id);
-       
+    // console.log(req.param);
 
-        // const deletedProduct = await receipt.findByIdAndDelete(req.params.id);
+    try {
         const deletedProduct = await receipt.findByIdAndUpdate(
             req.params.id,
 
-            { $set: { deleted: true, deletedAt: new Date() }, deleted_By: req.param.user }, // Set the deleted flag to true
+            { $set: { deleted: true, deletedAt: new Date() }, deleted_By: req.params.user }, 
             { new: true } // Return the updated document
         );
         if (!deletedProduct) {
             return res.status(404).json({ message: "LR not found!" });
         }
-
+        // console.log("deletedProduct", deletedProduct);
+       
         res.json({ message: "LR deleted successfully!", deletedProduct });
     } catch (error) {
         console.error("Error deleting LR:", error);

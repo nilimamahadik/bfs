@@ -16,9 +16,9 @@ const BASEURL = "/api"
 const StockReport = () => {
   const params = useParams()
   const [products, setProducts] = useState([]);
-  // console.log(products);
+  // //console.log(products);
   const [stocks, setStocks] = useState([]);
-  console.log(stocks);
+  //console.log(stocks);
   const [fromDate, setFromDate] = useState(null);
   const [toDate, setToDate] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
@@ -119,7 +119,7 @@ const StockReport = () => {
 
   ];
   const rows = stocks?.map((item, index) => {
-    console.log(item);
+    //console.log(item);
 
     const manufacturerNames =
       Array.isArray(item?.manufacturer) && item?.manufacturer.length > 0

@@ -65,7 +65,7 @@ const Sidebar = ({ children }) => {
   };
   const isActive = (path) => decodeURIComponent(location.pathname) === decodeURIComponent(path);
   // const isActive = (path) => location.pathname === path;
-  console.log(isActive);
+  //console.log(isActive);
 
   const submit = () => {
     navigate(`/csv/${value.id}`);

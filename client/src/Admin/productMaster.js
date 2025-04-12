@@ -26,10 +26,10 @@ const BASEURL = "/api"
 const ProductMaster = () => {
     const navigate = useNavigate();
     const { groupId } = useParams()
-    ////console.log(groupId);
+    //////console.log(groupId);
 
     const [products, setProducts] = useState([]);
-    console.log(products);
+    // console.log(products);
     const [currentProduct, setCurrentProduct] = useState(null); // Stores Selected Product for Editing
     const [editOpen, setEditOpen] = useState(false); // Controls Edit Modal State
     const [value, setValue] = useState({})
@@ -113,7 +113,7 @@ const ProductMaster = () => {
     };
 
     const handleEditOpen = (product) => {
-        console.log("Editing Product:", product);
+        //console.log("Editing Product:", product);
         setCurrentProduct(product);
         editForm.setFieldsValue(product); // Pre-fill form with selected product details
         setEditOpen(true);
@@ -123,9 +123,9 @@ const ProductMaster = () => {
     // Add Product
     const addProduct = () => {
         form.validateFields().then(async (values) => {
-            console.log("values", values);
+            //console.log("values", values);
 
-            //console.log("User ID:", value.id);
+            ////console.log("User ID:", value.id);
             const payload = { ...values, groupId };
             try {
                 const response = await axios.post(`${BASEURL}/productmaster`, payload);

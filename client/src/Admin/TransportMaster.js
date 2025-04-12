@@ -34,7 +34,7 @@ const TransportMaster = () => {
     // const [transportList, settransports] = useState([]);
 
     const [products, settransports] = useState([]);
-    console.log(products);
+    //console.log(products);
 
 
     const [currenttransport, setCurrenttransport] = useState(null); // Stores Selected transport for Editing

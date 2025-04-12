@@ -34,11 +34,11 @@ const BASEURL = "/api"
 
 const Recycle = (props) => {
     const params = useParams()
-    console.log(params);
+    //console.log(params);
 
     const [data, setData] = useState([])
-    console.log(data);
-    
+    //console.log(data);
+
     const [receipt, setReceipt] = useState([]);
     const { Title } = Typography;
     const [value, setValue] = useState({})
@@ -58,8 +58,9 @@ const Recycle = (props) => {
 
         const get = axios.get(`${BASEURL}/getallusers/${params.groupId}`)
             .then((res) => {
+                //console.log("res", res?.data);
                 const filteredData = res.data.data.filter(user => user.deleted);
-                console.log("filteredData", filteredData);
+                //console.log("filteredData", filteredData);
 
                 setData(filteredData);
                 localStorage.setItem("count", JSON.stringify(res.data));
@@ -91,8 +92,7 @@ const Recycle = (props) => {
         { field: "id", headerName: "S.N.", minWidth: 50, flex: 1, pinned: "left" },
         { field: "receipt_number", headerName: "LR No.", minWidth: 150, flex: 1 },
         { field: "deletedAt", headerName: "Deleted At", minWidth: 200, flex: 1 },
-        // { field: "deleted_By", headerName: "Deleted By", minWidth: 200, flex: 1 },
-
+        { field: "deleted_By", headerName: "Deleted By", minWidth: 200, flex: 1 },
         { field: "checkedValues", headerName: "Delivery Type", minWidth: 150, flex: 1 },
         { field: "vendor_name", headerName: "Name of Consignor", minWidth: 200, flex: 1 },
         { field: "address", headerName: "Address", minWidth: 200, flex: 2 },
@@ -175,8 +175,9 @@ const Recycle = (props) => {
     ];
 
     const rows = data?.map((item, index) => {
-       
-        
+
+        //console.log(item);
+
 
         return {
             id: index + 1,

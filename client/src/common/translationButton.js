@@ -57,7 +57,7 @@ function TranslateButton({ targetId }) {
         const select = document.querySelector(".goog-te-combo");
         if (select) {
           clearInterval(retryInterval); // Stop retrying once the element is found
-          console.log("Google Translate dropdown found. Setting language:", lang);
+          //console.log("Google Translate dropdown found. Setting language:", lang);
           select.value = lang;
           select.dispatchEvent(new Event("change"));
   

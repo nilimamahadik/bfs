@@ -23,13 +23,12 @@ const ExportCSV = ({ data, products }) => {
     { label: "MT", key: "mt" },
     { label: "Total Freight", key: "total_freight" },
     { label: "Delivery Type", key: "checkedValues" },
-    { label: "Total Balance Amount", key: "total_balanceamount" },
-    { label: "Advance Cash (Rs.)", key: "sc" },
-
-    { label: "Diesel (Rs.)", key: "hamali" },
-    { label: "To Pay ", key: "topayamt" },
     { label: "Total Amount", key: "total_amount" },
+    { label: "Advance Cash (Rs.)", key: "sc" },
+    { label: "Diesel (Rs.)", key: "hamali" },
+    { label: "Total Balance Amount", key: "total_balanceamount" },
     { label: "Rate(Ex)", key: "topayrate" },
+    { label: "To Pay ", key: "topayamt" },
   ];
 
   const finduom = (productName) => {

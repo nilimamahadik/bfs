@@ -92,7 +92,7 @@ const Forget = () => {
             //   setError(false)
         } else {
             //   setError(true)
-            console.log("something wrong");
+            // console.log("something wrong");
         }
     }
 

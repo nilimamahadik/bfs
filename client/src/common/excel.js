@@ -28,10 +28,10 @@ const Sheet = () => {
   const [toDate, setToDate] = useState(null);
 
   const [data, setData] = useState([])
-  console.log("data", data);
+  //console.log("data", data);
 
   const [products, setProducts] = useState([]);
-  console.log(products);
+  //console.log(products);
 
   const fetchProducts = async () => {
     if (params?.id) {
@@ -265,17 +265,12 @@ const Sheet = () => {
       },
     },
     { field: "checkedValues", headerName: "Delivery Type", minWidth: 150, flex: 1 },
-
-
-    { field: "total_balanceamount", headerName: "Total Balance Amount", minWidth: 200, flex: 1 },
+    { field: "total_amount", headerName: "Total Amount", minWidth: 150, flex: 1 },
     { field: "sc", headerName: "Advance Cash (Rs.)", minWidth: 180, flex: 1.5 },
     { field: "hamali", headerName: "Diesel (Rs.)", minWidth: 150, flex: 1 },
-    { field: "topayamt", headerName: "To Pay ", minWidth: 150, flex: 1 },
-    { field: "total_amount", headerName: "Total Amount", minWidth: 150, flex: 1 },
+    { field: "total_balanceamount", headerName: "Total Balance Amount", minWidth: 200, flex: 1 },
     { field: "topayrate", headerName: "Rate", minWidth: 150, flex: 1 },
-
-
-
+    { field: "topayamt", headerName: "To Pay ", minWidth: 150, flex: 1 },
   ];
 
   const rows = data?.map((item, index) => {
