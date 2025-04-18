@@ -41,8 +41,6 @@ const ProductMaster = () => {
     const [open, setOpen] = useState(false); // Controls Modal State
     const [form] = Form.useForm(); // Antd Form Hook
     const userId = value.id
-    const [consignee, setConsignees] = useState([]);
-    //console.log(products);
 
     const handleOpen = () => {
         form.resetFields();
@@ -152,6 +150,8 @@ const ProductMaster = () => {
     const fetchProducts = async () => {
         try {
             const response = await axios.get(`${BASEURL}/products/${groupId}`);
+            console.log("response", response);
+            
             const activeProducts = response?.data?.products?.filter(product => product.active === true);
 
             setProducts(activeProducts);
@@ -171,6 +171,7 @@ const ProductMaster = () => {
                 p._id === currentProduct._id ? { ...p, ...values } : p
             );
             setProducts(updatedProducts);
+           
             message.success({
                 content: response.data.message,
                 duration: 2, // Time before it disappears (in seconds)
@@ -180,6 +181,7 @@ const ProductMaster = () => {
                     // Moves it to center horizontally
                 }
             });
+            fetchProducts();
             // message.success(response.data.message);
             setEditOpen(false); // Close modal after successful edit
         } catch (error) {
@@ -194,28 +196,7 @@ const ProductMaster = () => {
     }, []);
 
 
-    const deleteProduct = async (id) => {
-        //console.log("Deleting Product:", id);
-
-        try {
-            await axios.delete(`${BASEURL}/productmaster/${id}`);
-            setProducts(products.filter((product) => product._id !== id));
-
-            message.success({
-                content: "Product deleted successfully!",
-                duration: 2, // Time before it disappears (in seconds)
-                style: {
-                    marginTop: "25vh", // Moves it to center vertically
-                    textAlign: "center", // Ensures text is centered
-                    // Moves it to center horizontally
-                }
-            });
-
-        } catch (error) {
-            //console.error("Error deleting product:", error);
-            message.error("Failed to delete product!");
-        }
-    };
+  
 
 
     // Table Columns
@@ -228,24 +209,24 @@ const ProductMaster = () => {
         { field: "uom", headerName: "Unit of Measurement", minWidth: 60, flex: 0.5 },
         { field: "rate", headerName: "Weight (kg)", minWidth: 40, flex: 0.5 },
         { field: "createdAt", headerName: "created Date", minWidth: 40, flex: 0.7 },
-        {
-            field: "active",
-            headerName: "Status",
-            sortable: false,
-            flex: 0.4,
-            renderCell: (params) => {
-                return (
-                    <div
-                        style={{
-                            color: params.value === "ACTIVE" ? "green" : "red", // Conditional text color
+        // {
+        //     field: "active",
+        //     headerName: "Status",
+        //     sortable: false,
+        //     flex: 0.4,
+        //     renderCell: (params) => {
+        //         return (
+        //             <div
+        //                 style={{
+        //                     color: params.value === "ACTIVE" ? "green" : "red", // Conditional text color
 
-                        }}
-                    >
-                        {params.value}
-                    </div>
-                );
-            },
-        },
+        //                 }}
+        //             >
+        //                 {params.value}
+        //             </div>
+        //         );
+        //     },
+        // },
         {
             field: "actions",
             headerName: "Actions",

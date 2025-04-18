@@ -103,9 +103,10 @@ const TransportMaster = () => {
     const fetchtransports = async () => {
         try {
             const response = await axios.get(`${BASEURL}/gettransportdetails/${groupId}`);
-            //console.log(response);
+            console.log(response);
+            const activeProducts = response?.data?.transportdetails?.filter(product => product.active === true);
 
-            settransports(response?.data?.transportdetails);
+            settransports(activeProducts);
         } catch (error) {
             // // console.error("Error fetching products:", error);
         }
@@ -129,6 +130,7 @@ const TransportMaster = () => {
                     textAlign: "center", // Ensures text is centered
                 }
             });
+            fetchtransports()
             // message.success(response.data.message);
             setEditOpen(false); // Close modal after successful edit
         } catch (error) {
@@ -228,24 +230,24 @@ const TransportMaster = () => {
             minWidth: 40,
             flex: 0.5,
         },
-        {
-            field: "active",
-            headerName: "Status",
-            sortable: false,
-            flex: 0.4,
-            renderCell: (params) => {
-                return (
-                    <div
-                        style={{
-                            color: params.value === "ACTIVE" ? "green" : "red", // Conditional text color
+        // {
+        //     field: "active",
+        //     headerName: "Status",
+        //     sortable: false,
+        //     flex: 0.4,
+        //     renderCell: (params) => {
+        //         return (
+        //             <div
+        //                 style={{
+        //                     color: params.value === "ACTIVE" ? "green" : "red", // Conditional text color
 
-                        }}
-                    >
-                        {params.value}
-                    </div>
-                );
-            },
-        },
+        //                 }}
+        //             >
+        //                 {params.value}
+        //             </div>
+        //         );
+        //     },
+        // },
         {
             field: "actions",
             headerName: "Actions",

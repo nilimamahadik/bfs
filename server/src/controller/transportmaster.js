@@ -2,7 +2,7 @@
 const transportmaster = require("../models/transportmaster");
 
 exports.transportmaster = async (req, res) => {
-    console.log(req.body);
+    // console.log(req.body);
     
     try {
         // Create a new transport document
@@ -90,7 +90,7 @@ exports.updateTranportDetails = async (req, res) => {
 exports.uploadtransport = async (req, res) => {
     try {
         const { products } = req.body;
-        console.log("Received Data:", products);
+        // console.log("Received Data:", products);
 
         const validConsignees = products
             .filter(c => c.from && c.truckNo && c.truckDriverName && c.group_id)

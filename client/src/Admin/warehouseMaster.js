@@ -103,7 +103,9 @@ const WarehouseMaster = () => {
     const fetchWarehouses = async () => {
         try {
             const response = await axios.get(`${BASEURL}/getwarehouse/${groupId}`);
-            setWarehouses(response?.data?.products);
+            const activeProducts = response?.data?.products?.filter(product => product.active === true);
+
+            setWarehouses(activeProducts);
         } catch (error) {
             // // console.error("Error fetching products:", error);
         }
@@ -129,6 +131,7 @@ const WarehouseMaster = () => {
                     // Moves it to center horizontally
                 }
             });
+            fetchWarehouses();
             // message.success(response.data.message);
             setEditOpen(false); // Close modal after successful edit
         } catch (error) {
@@ -222,24 +225,24 @@ const WarehouseMaster = () => {
         { field: "manager", headerName: "Name of Manager ", minWidth: 80, flex: 1 },
         { field: "mobileNo", headerName: "Mobile No.", minWidth: 40, flex: 1 },
         { field: "createdAt", headerName: "Created At", minWidth: 40, flex: 1 },
-        {
-            field: "active",
-            headerName: "Status",
-            sortable: false,
-            flex: 0.4,
-            renderCell: (params) => {
-                return (
-                    <div
-                        style={{
-                            color: params.value === "ACTIVE" ? "green" : "red", // Conditional text color
+        // {
+        //     field: "active",
+        //     headerName: "Status",
+        //     sortable: false,
+        //     flex: 0.4,
+        //     renderCell: (params) => {
+        //         return (
+        //             <div
+        //                 style={{
+        //                     color: params.value === "ACTIVE" ? "green" : "red", // Conditional text color
 
-                        }}
-                    >
-                        {params.value}
-                    </div>
-                );
-            },
-        },
+        //                 }}
+        //             >
+        //                 {params.value}
+        //             </div>
+        //         );
+        //     },
+        // },
         {
             field: "actions",
             headerName: "Actions",

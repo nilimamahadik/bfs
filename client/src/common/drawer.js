@@ -43,6 +43,7 @@ import { MdReport } from "react-icons/md";
 import { RiLogoutCircleRFill } from "react-icons/ri";
 import { FaTruck } from "react-icons/fa6";
 import { FaUserTie } from "react-icons/fa6";
+import { FaTools } from "react-icons/fa";
 const drawerWidth = 240;
 
 
@@ -182,7 +183,7 @@ const Sidebar = ({ children }) => {
 
 
         <ListItem button onClick={() => setOpenTool(!opentool)}>
-          <ListItemIcon><BiSolidReport size={22} style={{ color: "#AA2B1D" }} /></ListItemIcon>
+          <ListItemIcon><FaTools  size={19} style={{ color: "#AA2B1D" }} /></ListItemIcon>
           {drawerOpen && <ListItemText primary="Admin Tools" />}
           {opentool ? <ExpandLess sx={{ color: "#AA2B1D" }} /> : <ExpandMore sx={{ color: "#AA2B1D" }} />}
         </ListItem>
