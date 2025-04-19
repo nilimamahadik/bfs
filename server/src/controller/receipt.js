@@ -30,7 +30,12 @@ exports.submit_form = async (req, res) => {
             topayrate,
             total_amount,
             topayamt,
-            update
+            update,
+            name_hin,
+            Place_hin,
+            consignee_hindi,
+            place_hindi,
+            district_hindi
         } = req.body;
 
         // console.log("1", req.body);
@@ -123,7 +128,11 @@ exports.submit_form = async (req, res) => {
                 tran_date: new Date(),
                 receipt_number: receiptNo,
                 vendor_name: vendor_name.trim(),
+                name_hin: name_hin && name_hin,
+
                 address: address.trim(),
+                Place_hin: Place_hin && Place_hin,
+
                 from: from ? from.trim() : "",
                 productDetails: parsed_productdetails,
                 ship_to_address1: ship_to_address1 ? ship_to_address1.trim() : "",
@@ -145,7 +154,10 @@ exports.submit_form = async (req, res) => {
                 topayamt: topayamt || 0,
                 group_id: group_id?.trim(),
                 receiver: receiver ? receiver.trim() : "",
-                checkedValues: checkedValues ? checkedValues.trim() : ""
+                checkedValues: checkedValues ? checkedValues.trim() : "",
+                consignee_hindi: consignee_hindi && consignee_hindi,
+                place_hindi: place_hindi && place_hindi,
+                district_hindi: district_hindi && district_hindi
             });
 
             // Save the receipt to the database
@@ -405,14 +417,14 @@ exports.deleteReceipt = async (req, res) => {
         const deletedProduct = await receipt.findByIdAndUpdate(
             req.params.id,
 
-            { $set: { deleted: true, deletedAt: new Date() }, deleted_By: req.params.user }, 
+            { $set: { deleted: true, deletedAt: new Date() }, deleted_By: req.params.user },
             { new: true } // Return the updated document
         );
         if (!deletedProduct) {
             return res.status(404).json({ message: "LR not found!" });
         }
         // console.log("deletedProduct", deletedProduct);
-       
+
         res.json({ message: "LR deleted successfully!", deletedProduct });
     } catch (error) {
         console.error("Error deleting LR:", error);

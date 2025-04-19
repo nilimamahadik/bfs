@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { Box, Button, Menu, MenuItem } from "@mui/material";
 
 function TranslateButton({ targetId }) {
+  console.log(targetId);
+
   const [anchorEl, setAnchorEl] = useState(null);
   const [googleLoaded, setGoogleLoaded] = useState(false);
 
@@ -43,28 +45,33 @@ function TranslateButton({ targetId }) {
     }
     setAnchorEl(event.currentTarget);
   };
+
   const handleClose = (lang) => {
     setAnchorEl(null);
     if (lang) {
       const targetElement = document.getElementById(targetId);
+      console.log(targetElement);
+
       if (!targetElement) {
         console.error(`Element with ID "${targetId}" not found.`);
         alert("Target element not found. Please check the targetId.");
         return;
       }
-  
+
       const retryInterval = setInterval(() => {
         const select = document.querySelector(".goog-te-combo");
+        console.log(select);
+
         if (select) {
           clearInterval(retryInterval); // Stop retrying once the element is found
           //console.log("Google Translate dropdown found. Setting language:", lang);
           select.value = lang;
           select.dispatchEvent(new Event("change"));
-  
+
           // Isolate translation to the target element
-          targetElement.classList.add("translate-target");
+          targetElement.classList.add("content-to-translate");
         } else {
-          console.warn("Retrying: Google Translate dropdown (.goog-te-combo) not found.");
+          console.log("Retrying: Google Translate dropdown (.goog-te-combo) not found.");
         }
       }, 200); // Retry every 200ms
       setTimeout(() => {
@@ -92,3 +99,5 @@ function TranslateButton({ targetId }) {
 }
 
 export default TranslateButton;
+
+

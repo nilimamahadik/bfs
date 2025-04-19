@@ -15,12 +15,16 @@ const Recycle = () => {
     const params = useParams()
 
     const [data, setData] = useState([])
-    console.log(data);
+    // console.log(data);
     const navigate = useNavigate();
     const [value, setValue] = useState([])
     const [product, setProduct] = useState([])
     const [consignee, setConsignee] = useState([])
+    // // console.log(consignee);
+
     const [warehouse, setWareHouse] = useState([])
+    // console.log(warehouse);
+
     const [transport, setTransport] = useState([])
     const [consignor, setConsignor] = useState([])
 
@@ -40,14 +44,14 @@ const Recycle = () => {
     const fetchProducts = async () => {
         try {
             const response = await axios.get(`${BASEURL}/products/${params.groupId}`);
-            console.log("response", response);
+            // console.log("response", response);
 
             const activeProducts = response?.data?.products?.filter(product => product.active === false);
-            console.log("product", activeProducts);
+            // console.log("product", activeProducts);
 
             setProduct(activeProducts);
         } catch (error) {
-            //console.error("Error fetching products:", error);
+            //// console.error("Error fetching products:", error);
         }
     };
     const fetchConsignees = async () => {
@@ -55,11 +59,11 @@ const Recycle = () => {
             const response = await axios.get(`${BASEURL}/consignee/${params.groupId}`);
             // console.log(response);
             const activeProducts = response?.data?.products?.filter(product => product.active === false);
-            console.log("consignee", activeProducts);
+            // console.log("consignee", activeProducts);
 
             setConsignee(activeProducts);
         } catch (error) {
-            // // console.error("Error fetching products:", error);
+            // // // console.error("Error fetching products:", error);
         }
     };
 
@@ -70,18 +74,18 @@ const Recycle = () => {
 
             setWareHouse(activeProducts);
         } catch (error) {
-            // // console.error("Error fetching products:", error);
+            // // // console.error("Error fetching products:", error);
         }
     };
     const fetchtransports = async () => {
         try {
             const response = await axios.get(`${BASEURL}/gettransportdetails/${params.groupId}`);
-            console.log(response);
+            // console.log(response);
             const activeProducts = response?.data?.transportdetails?.filter(product => product.active === false);
 
             setTransport(activeProducts);
         } catch (error) {
-            // // console.error("Error fetching products:", error);
+            // // // console.error("Error fetching products:", error);
         }
     };
     const fetchConsignors = async () => {
@@ -120,89 +124,55 @@ const Recycle = () => {
     }, []);
 
     const productColumns = [
-        {
-            field: "products",
-            headerName: "Product Name",
-            minWidth: 200,
-            flex: 1,
-            renderCell: (params) => (
-                <div>
-                    {params.row.productDetails?.map((product, index) => (
-                        <div
-                            key={index}
-                            style={{
-                                borderBottom: "1px solid #ddd",
-                                paddingBottom: "5px",
-                                marginBottom: "5px",
-                            }}
-                        >
-                            {product.product_name}
-                        </div>
-                    ))}
-                </div>
-            ),
-        },
-        {
-            field: "Code",
-            headerName: "Code",
-            minWidth: 200,
-            flex: 1,
-            renderCell: (params) => (
-                <div>
-                    {params.row.productDetails?.map((product, index) => (
-                        <div
-                            key={index}
-                            style={{
-                                borderBottom: "1px solid #ddd",
-                                paddingBottom: "5px",
-                                marginBottom: "5px",
-                            }}
-                        >
-                            {product.product_code}
-                        </div>
-                    ))}
-                </div>
-            ),
-        },
-        {
-            field: "total",
-            headerName: "Total Freight",
-            minWidth: 200,
-            flex: 1,
-            renderCell: (params) => (
-                <div>
-                    {params.row.productDetails?.map((product, index) => (
-                        <div
-                            key={index}
-                            style={{
-                                borderBottom: "1px solid #ddd",
-                                paddingBottom: "5px",
-                                marginBottom: "5px",
-                            }}
-                        >
-                            {product.total_freight}
-                        </div>
-                    ))}
-                </div>
-            ),
-        },
+        { field: "id", headerName: "Sr. No.", minWidth: 30, flex: 0.5 },
+        { field: "manufacturer", headerName: "Manufacturer Name", minWidth: 50, flex: 0.8 },
+        { field: "name", headerName: "Product Name", minWidth: 60, flex: 1 },
+        { field: "code", headerName: "Product Code", minWidth: 80, flex: 1 },
+        { field: "uom", headerName: "Unit of Measurement", minWidth: 60, flex: 0.5 },
+        { field: "rate", headerName: "Weight (kg)", minWidth: 40, flex: 0.5 },
+        { field: "createdAt", headerName: "created Date", minWidth: 40, flex: 0.7 },
     ];
 
     const transportColumns = [
-        { field: "vendor_name", headerName: "Name of Consignor", minWidth: 200, flex: 1 },
-        { field: "address", headerName: "Address", minWidth: 200, flex: 2 },
-    ];
+        { field: "id", headerName: "Sr. No.", minWidth: 30, flex: 0.2 },
+        { field: "name", headerName: "From", minWidth: 100, flex: 0.5 },
+        { field: "place", headerName: "Truck No.", minWidth: 100, flex: 0.5 },
+        { field: "district", headerName: "Truck Driver Name", minWidth: 100, flex: 0.5 },
+        { field: "mobileNo", headerName: "Driver Mobile No.", minWidth: 80, flex: 0.5 },
+        {
+            field: "createdDate",
+            headerName: "Created Date",
+            minWidth: 40,
+            flex: 0.5,
+        },];
 
     const consignorColumns = [
-        { field: "vendor_name", headerName: "Name of Consignor", minWidth: 200, flex: 1 },
-        { field: "address", headerName: "Address", minWidth: 200, flex: 2 },
-    ];
+        { field: "id", headerName: "Sr. No.", minWidth: 30, flex: 0.2 },
+        { field: "name", headerName: "Name of Consignor", minWidth: 150, flex: 1 },
+        { field: "place", headerName: "Address", minWidth: 60, flex: 0.5 },
+        { field: "district", headerName: "District", minWidth: 60, flex: 0.5 },
+        { field: "mobileNo", headerName: "Mobile No.", minWidth: 40, flex: 0.5 },
+        {
+            field: "createdDate",
+            headerName: "Created Date",
+            minWidth: 40,
+            flex: 0.5,
+        }, 
+       ];
 
 
     const consigneeColumns = [
-        { field: "supplier_name", headerName: "Consignee Name", minWidth: 200, flex: 1 },
-        { field: "ship_to_address1", headerName: "Place", minWidth: 150, flex: 1 },
-        { field: "ship_to_district", headerName: "District", minWidth: 120, flex: 1 },
+        { field: "id", headerName: "Sr. No.", minWidth: 30, flex: 0.2 },
+        { field: "name", headerName: "Name of Consignor", minWidth: 150, flex: 1 },
+        { field: "place", headerName: "Address", minWidth: 60, flex: 0.5 },
+        { field: "district", headerName: "District", minWidth: 60, flex: 0.5 },
+        { field: "mobileNo", headerName: "Mobile No.", minWidth: 40, flex: 0.5 },
+        {
+            field: "createdDate",
+            headerName: "Created Date",
+            minWidth: 40,
+            flex: 0.5,
+        },
     ];
 
     const lrColumns = [
@@ -292,13 +262,18 @@ const Recycle = () => {
     ];
 
     const warehouseColumns = [
-        { field: "vendor_name", headerName: "Name of Consignor", minWidth: 200, flex: 1 },
-        { field: "address", headerName: "Address", minWidth: 200, flex: 2 },
+        { field: "id", headerName: "Sr. No.", minWidth: 30, flex: 0.5 },
+        { field: "name", headerName: "Name of Warehouse", minWidth: 150, flex: 1 },
+        { field: "place", headerName: "Place", minWidth: 60, flex: 0.5 },
+        { field: "capacity", headerName: "Capacity", minWidth: 60, flex: 0.5 },
+        { field: "manager", headerName: "Name of Manager ", minWidth: 80, flex: 1 },
+        { field: "mobileNo", headerName: "Mobile No.", minWidth: 40, flex: 1 },
+        { field: "createdAt", headerName: "Created At", minWidth: 40, flex: 1 },
     ];
 
 
     const rows = data?.map((item, index) => {
-        console.log(item);
+        // console.log(item);
 
         return {
             id: index + 1,
@@ -329,40 +304,84 @@ const Recycle = () => {
             deleted_By: item.deleted_By
         };
     }) || [];
+    const findstatus = (status) => {
+        return status ? 'ACTIVE' : "INACTIVE"
+    }
+
+    const rowProducts = product?.map((item, index) => {
+        // console.log(item);
+        return {
+            id: index + 1,
+            name: item.name || "NA",
+            code: item.code || "NA",
+            uom: item.uom || "NA",
+            rate: item.rate || "NA",
+            _id: item,
+            createdAt: getIndianTimestamp(item.createdAt) || "NA",
+            manufacturer: item.manufacturer || "NA",
+            active: findstatus(item.active) || "NA"
+        };
+    }) || [];
 
 
-    // const rowProducts = product?.map((item, index) => {
-    //     console.log(item);
+    const rowsConsignees = consignee?.map((item, index) => {
+        // console.log(item);
 
-    //     return {
-    //         id: index + 1,
-    //         Date: getIndianTimestamp(item.createdAt) || "NA",
-    //         receipt_number: item.receipt_number || "NA",
-    //         supplier_name: item.supplier_name || "NA",
-    //         vendor_name: item.vendor_name || "NA",
-    //         address: item.address || "NA",
-    //         ship_to_address1: item.ship_to_address1 || "NA",
-    //         ship_to_district: item.ship_to_district || "NA",
-    //         transport_driver_name: item.transport_driver_name || "NA",
-    //         transport_number: item.transport_number || "NA",
-    //         productDetails: item.productDetails || [],
-    //         checkedValues: item.checkedValues || "NA",
-    //         from: item.from || "NA",
-    //         record_id: item._id || "NA",
-    //         transport_mode: item.transport_mode || "NA",
-    //         sum: item.total_amount || "0",
-    //         sc: item.sc || "0",
-    //         hamali: item.sch || "0",
-    //         total_balanceamount: item.total_balanceamount || "0",
-    //         mobileNo: item.mobileNo || "NA",
-    //         total: item.total || "0",
-    //         topayrate: item.topayrate || "0",
-    //         topayamt: item.topayamt || "0",
-    //         doc: item,
-    //         deletedAt: getIndianTimestamp(item.deletedAt) || "NA",
-    //         deleted_By: item.deleted_By
-    //     };
-    // }) || [];
+        return {
+            id: index + 1,
+            name: item.name || "NA",
+            place: item.place || "NA",
+            district: item.district || "NA",
+            mobileNo: item.mobileNo || "NA",
+            createdDate: getIndianTimestamp(item.createdAt) || "NA",
+            _id: item,
+            active: findstatus(item.active) || "NA"
+        };
+    }) || [];
+
+    const rowsWarehouse = warehouse?.map((item, index) => {
+        return {
+            id: index + 1,
+            name: item.name || "NA",
+            place: item.place || "NA",
+            capacity: item.capacity || "NA",
+            manager: item.manager || "NA",
+            mobileNo: item.mobileNo || "NA",
+            _id: item, // ✅ Include _id for delete action
+            createdAt: getIndianTimestamp(item.createdAt) || "NA",
+            active: findstatus(item.active) || "NA"
+
+        };
+    }) || [];
+
+    const rowsTransport = transport?.map((item, index) => {
+        return {
+            id: index + 1,
+            name: item.from || "NA",
+            place: item.truckNo || "NA",
+            district: item.truckDriverName || "NA",
+            mobileNo: item.mobileNo || "NA",
+            createdDate: getIndianTimestamp(item.createdAt) || "NA",
+            _id: item,
+            active: findstatus(item.active) || "NA"
+        };
+    }) || [];
+
+    const rowsConsignor = consignor?.map((item, index) => {
+            //console.log(item);
+    
+            return {
+                id: index + 1,
+                name: item.name || "NA",
+                place: item.place || "NA",
+                district: item.district || "NA",
+                mobileNo: item.mobileNo || "NA",
+                createdDate: getIndianTimestamp(item.createdAt) || "NA",
+                _id: item, // ✅ Include _id for delete action
+                active: findstatus(item.active) || "NA"
+    
+            };
+        }) || [];
 
     return (
         <>
@@ -401,7 +420,7 @@ const Recycle = () => {
                 >
                     <DataTable rows={rows} columns={lrColumns} />
                 </Tabs.TabPane>
-                {/* <Tabs.TabPane
+                <Tabs.TabPane
                     tab="Product Master"
                     key="2"
                     style={{
@@ -409,7 +428,7 @@ const Recycle = () => {
                         minHeight: "400px",
                     }}
                 >
-                    <DataTable rows={rows} columns={productColumns} />
+                    <DataTable rows={rowProducts} columns={productColumns} />
                 </Tabs.TabPane>
                 <Tabs.TabPane
                     tab="Consignee Master"
@@ -419,7 +438,7 @@ const Recycle = () => {
                         minHeight: "400px",
                     }}
                 >
-                    <DataTable rows={rows} columns={consigneeColumns} />
+                    <DataTable rows={rowsConsignees} columns={consigneeColumns} />
                 </Tabs.TabPane>
                 <Tabs.TabPane
                     tab="Warehouse Master"
@@ -429,7 +448,7 @@ const Recycle = () => {
                         minHeight: "400px",
                     }}
                 >
-                    <DataTable rows={rows} columns={warehouseColumns} />
+                    <DataTable rows={rowsWarehouse} columns={warehouseColumns} />
                 </Tabs.TabPane>
                 <Tabs.TabPane
                     tab="Transport Master"
@@ -439,8 +458,11 @@ const Recycle = () => {
                         minHeight: "400px",
                     }}
                 >
-                    <DataTable rows={rows} columns={transportColumns} />
+                    <DataTable rows={rowsTransport} columns={transportColumns} />
                 </Tabs.TabPane>
+                
+           
+               
                 <Tabs.TabPane
                     tab="Consignor Master"
                     key="6"
@@ -449,8 +471,8 @@ const Recycle = () => {
                         minHeight: "400px",
                     }}
                 >
-                    <DataTable rows={rows} columns={consignorColumns} />
-                </Tabs.TabPane> */}
+                    <DataTable rows={rowsConsignor} columns={consignorColumns} />
+                </Tabs.TabPane>
             </Tabs>
 
         </>

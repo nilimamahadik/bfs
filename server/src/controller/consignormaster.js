@@ -18,7 +18,9 @@ exports.Consignormaster = async (req, res) => {
         // Create a new product document
         const newProduct = new consignormaster({
             name: req.body.name,
+            name_hin: req.body.name_hin,
             place: req.body.place,
+            Place_hin: req.body.Place_hin,
             district: req.body.district,
             mobileNo: req.body.mobileNo,
             group_id: req.body.groupId

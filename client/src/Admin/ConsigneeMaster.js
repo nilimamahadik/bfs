@@ -21,6 +21,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { DataTable } from "../commonfunction/Datatable";
 import { getIndianTimestamp } from "../commonfunction/formatDate";
 import { MdArrowBack } from "react-icons/md";
+import { transliterate } from "transliteration";
 
 const BASEURL = "/api"
 
@@ -73,28 +74,74 @@ const ConsigneeMaster = () => {
 
     const handleClose = () => setOpen(false);
     // Add Consignee
+    // const addConsignee = () => {
+    //     form.validateFields().then(async (values) => {
+    //         // // console.log("values", values);
+    //         // // console.log("User ID:", value.id);
+    //         const payload = { ...values, groupId };
+    //         try {
+    //             const response = await axios.post(`${BASEURL}/consigneemaster`, payload);
+    //             // setConsignees([...products, response.data.product]); // Update UI
+    //             fetchConsignees();
+    //             message.success({
+    //                 content: response.data.message,
+    //                 duration: 2, // Time before it disappears (in seconds)
+    //                 style: {
+    //                     marginTop: "25vh", // Moves it to center vertically
+    //                     textAlign: "center", // Ensures text is centered
+    //                     // Moves it to center horizontally
+    //                 }
+    //             });
+    //             handleClose();
+    //         } catch (error) {
+    //             // // console.error("Error adding product:", error);
+    //             alert("Failed to add product!");
+    //         }
+    //     });
+    // };
     const addConsignee = () => {
         form.validateFields().then(async (values) => {
-            // // console.log("values", values);
-            // // console.log("User ID:", value.id);
-            const payload = { ...values, groupId };
+            // Transliterate to Hindi and Marathi
+            const name_hi = transliterate(values.name, { lang: "hi" });
+            console.log(name_hi);
+            
+            const name_mr = transliterate(values.name, { lang: "mr" });
+
+            const place_hi = transliterate(values.place, { lang: "hi" });
+            const place_mr = transliterate(values.place, { lang: "mr" });
+
+            const district_hi = transliterate(values.district, { lang: "hi" });
+            const district_mr = transliterate(values.district, { lang: "mr" });
+
+            // Build the final payload
+            const payload = {
+                ...values,
+                groupId,
+                name_hi,
+                name_mr,
+                place_hi,
+                place_mr,
+                district_hi,
+                district_mr,
+            };
+            console.log(payload);
+            return
+
             try {
                 const response = await axios.post(`${BASEURL}/consigneemaster`, payload);
-                // setConsignees([...products, response.data.product]); // Update UI
+
                 fetchConsignees();
                 message.success({
                     content: response.data.message,
-                    duration: 2, // Time before it disappears (in seconds)
+                    duration: 2,
                     style: {
-                        marginTop: "25vh", // Moves it to center vertically
-                        textAlign: "center", // Ensures text is centered
-                        // Moves it to center horizontally
-                    }
+                        marginTop: "25vh",
+                        textAlign: "center",
+                    },
                 });
                 handleClose();
             } catch (error) {
-                // // console.error("Error adding product:", error);
-                alert("Failed to add product!");
+                alert("Failed to add consignee!");
             }
         });
     };
@@ -294,7 +341,7 @@ const ConsigneeMaster = () => {
             district: item.district || "NA",
             mobileNo: item.mobileNo || "NA",
             createdDate: getIndianTimestamp(item.createdAt) || "NA",
-            _id: item, 
+            _id: item,
             active: findstatus(item.active) || "NA"
         };
     }) || [];
@@ -375,6 +422,13 @@ const ConsigneeMaster = () => {
                     >
                         <Input placeholder="Enter Name of Consignee" />
                     </Form.Item>
+                    {/* <Form.Item
+                        label="Name of Consignee in Hindi"
+                        name="consignee_hindi"
+                        rules={[{ required: true, message: "Please enter Name of Consignee in Hindi " }]}
+                    >
+                        <Input placeholder="Enter Name of Consignee in Hindi" />
+                    </Form.Item> */}
                     <Form.Item
                         label="Place"
                         name="place"
@@ -382,7 +436,13 @@ const ConsigneeMaster = () => {
                     >
                         <Input placeholder="Enter place " />
                     </Form.Item>
-
+                    {/* <Form.Item
+                        label="Place in Hindi"
+                        name="place_hindi"
+                        rules={[{ required: true, message: "Please enter place in Hindi " }]}
+                    >
+                        <Input placeholder="Enter place in Hindi " />
+                    </Form.Item> */}
                     <Form.Item
                         label="District"
                         name="district"
@@ -390,7 +450,13 @@ const ConsigneeMaster = () => {
                     >
                         <Input placeholder="Enter District" />
                     </Form.Item>
-
+                    {/* <Form.Item
+                        label="District in Hindi "
+                        name="district_hindi"
+                        rules={[{ required: true, message: "Please enter District in Hindi " }]}
+                    >
+                        <Input placeholder="Enter District in Hindi" />
+                    </Form.Item> */}
                     <Form.Item
                         label="Mobile Number"
                         name="mobileNo"

@@ -20,6 +20,9 @@ exports.consigneemaster = async (req, res) => {
             district: req.body.district,
             mobileNo: req.body.mobileNo,
             maplocation: req.body.maplocation,
+            consignee_hindi: req.body.consignee_hindi,
+            place_hindi: req.body.place_hindi,
+            district_hindi: req.body.district_hindi,
             group_id: req.body.groupId
         });
 

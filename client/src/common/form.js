@@ -48,7 +48,7 @@ const FormDataInfo = ({
     const [projectOptions, setProjectOptions] = useState([]);
     const [openUser, setOpenUser] = useState(false)
     const [consignee, setConsignees] = useState([]);
-    ////console.log(consignee);
+    console.log(consignee);
     const [consignor, setConsignors] = useState([]);
     // console.log(consignor);
     const [transport, setTransports] = useState([]);
@@ -59,8 +59,11 @@ const FormDataInfo = ({
     const groupId = params?.id
     ////console.log(groupId);
     const [selectedConsignee, setSelectedConsignee] = useState(null);
+    console.log(selectedConsignee);
 
     const [selectedConsignor, setSelectedConsignor] = useState(null);
+    console.log(selectedConsignor);
+
     const [selectedTransport, setSelectedTransport] = useState(null);
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [selectedProductCode, setSelectedProductCode] = useState(null);
@@ -187,7 +190,6 @@ const FormDataInfo = ({
         if (checkedValues?.length === 0) {
             alert("Please select FOR or Ex!")
         }
-        // cole.log(values)
 
 
         const userConfirmed = window.confirm(
@@ -200,8 +202,14 @@ const FormDataInfo = ({
             formData.append("transport_driver_name", values.transport_driver_name)
             formData.append("transport_mode", values.transport_mode)
             formData.append("vendor_name", values.vendor_name)
+            formData.append("name_hin", selectedConsignor.name_hin)
             formData.append("address", values.address)
+            formData.append("Place_hin", selectedConsignor.Place_hin)
             formData.append("supplier_name", values.supplier_name)
+            formData.append("consignee_hindi", selectedConsignee.consignee_hindi)
+            formData.append("place_hindi", selectedConsignee.place_hindi)
+            formData.append("district_hindi", selectedConsignee.district_hindi)
+
             formData.append("mobileNo", values.mobileNo)
             formData.append("ship_to_address1", values.ship_to_address1)
             formData.append("ship_to_district", values.ship_to_district)
@@ -222,7 +230,7 @@ const FormDataInfo = ({
 
             }
             // console.log(...formData.entries());
-            
+
             try {
                 const response = await axios.post(`${BASEURL}/submit`, formData);
                 //console.log(response);

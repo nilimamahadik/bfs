@@ -21,12 +21,16 @@ const applySchema = new mongoose.Schema(
     productDetails: [productSchema],
     from: { type: String, trim: true },
     vendor_name: { type: String, trim: true },
+    name_hin: { type: String, trim: true },
+    Place_hin: { type: String, trim: true },
     supplier_name: { type: String, trim: true },
     // mobileNo:{ type: Number, trim: true },
     mobileNo: { type: mongoose.Schema.Types.Mixed, default: "" },
 
     address: { type: String, trim: true },
-
+    consignee_hindi: { type: String, trim: true },
+    place_hindi: { type: String, trim: true },
+    district_hindi: { type: String, trim: true },
     // Shipping Details
     ship_to_address1: { type: String, trim: true },
     ship_to_address2: { type: String, trim: true },
@@ -66,8 +70,8 @@ const applySchema = new mongoose.Schema(
     topayrate: { type: Number, trim: true },
     topayamt: { type: Number, trim: true },
     total_amount: { type: Number, trim: true },
-    deleted: { type: Boolean, default: false }, 
-    deletedAt :{ type: Date },
+    deleted: { type: Boolean, default: false },
+    deletedAt: { type: Date },
     deleted_By: { type: String },
   },
   { timestamps: true }

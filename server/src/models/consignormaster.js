@@ -6,7 +6,9 @@ const mongoose = require("mongoose");
 
 const ConsignorSchema = new mongoose.Schema({
     name: { type: String, required: true },
+    name_hin: { type: String, required: true },
     place: { type: String, required: true },
+    Place_hin:{type: String, required: true },
     district: { type: String ,required: true },
     mobileNo: { type: mongoose.Schema.Types.Mixed, default: "" },    
     maplocation: { type: String },

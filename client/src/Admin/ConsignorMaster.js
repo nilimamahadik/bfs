@@ -145,31 +145,6 @@ const ConsignorMaster = () => {
         fetchConsignors();
     }, []);
 
-
-    const deleteConsignor = async (id) => {
-        //// // console.log("Deleting Consignor:", id);
-
-        try {
-            await axios.delete(`${BASEURL}/deleteconsignor/${id}`);
-            setConsignors(products.filter((product) => product._id !== id));
-
-            message.success({
-                content: "Consignor deleted successfully!",
-                duration: 2, // Time before it disappears (in seconds)
-                style: {
-                    marginTop: "25vh", // Moves it to center vertically
-                    textAlign: "center", // Ensures text is centered
-                    // Moves it to center horizontally
-                }
-            });
-
-        } catch (error) {
-            // // console.error("Error deleting product:", error);
-            message.error("Failed to delete product!");
-        }
-    };
-
-
     const handleUpload = async () => {
         if (fileList.length === 0) {
             message.error("Please select a CSV file to upload.");
@@ -182,9 +157,11 @@ const ConsignorMaster = () => {
             complete: async (result) => {
                 let records = result.data.slice(1).map(row => ({
                     name: row[0]?.trim() || "",
-                    place: row[1]?.trim() || "",
-                    district: row[2]?.trim() || "",
-                    mobileNo: isNaN(row[3]?.trim()) ? 0 : parseInt(row[3]?.trim(), 10),
+                    name_hin: row[1]?.trim() || "",
+                    place: row[2]?.trim() || "",
+                    Place_hin: row[3]?.trim() || "",
+                    district: row[4]?.trim() || "",
+                    mobileNo: isNaN(row[5]?.trim()) ? 0 : parseInt(row[5]?.trim(), 10),
                     group_id: value?.id,
                 }));
 
@@ -371,13 +348,26 @@ const ConsignorMaster = () => {
                         <Input placeholder="Enter Name of Consignor" />
                     </Form.Item>
                     <Form.Item
+                        label="Name of Consignor in Hindi"
+                        name="name_hin"
+                        rules={[{ required: true, message: "Please enter Name of Consignor in Hindi" }]}
+                    >
+                        <Input placeholder="Enter Name of Consignor in Hindi" />
+                    </Form.Item>
+                    <Form.Item
                         label="Address"
                         name="place"
                         rules={[{ required: true, message: "Please enter place" }]}
                     >
                         <Input placeholder="Enter place " />
                     </Form.Item>
-
+                    <Form.Item
+                        label="Address in Hindi"
+                        name="Place_hin"
+                        rules={[{ required: true, message: "Please enter place in Hindi" }]}
+                    >
+                        <Input placeholder="Enter place in Hindi " />
+                    </Form.Item>
                     <Form.Item
                         label="District"
                         name="district"
