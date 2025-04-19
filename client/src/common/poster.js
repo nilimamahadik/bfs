@@ -1,6 +1,3 @@
-
-
-
 import React, { useRef, useImperativeHandle, forwardRef, useState, useEffect } from "react";
 import { toPng } from "html-to-image";
 import { jsPDF } from "jspdf";
@@ -10,6 +7,7 @@ import { useReactToPrint } from 'react-to-print';
 import numberToWords from "number-to-words";
 import axios from 'axios';
 import TranslateButton from './translationButton';
+import Sanscript from "@sanskrit-coders/sanscript";
 
 import { formatDate, formatIndianCurrency } from '../commonfunction/formatDate';
 import {
@@ -251,13 +249,25 @@ const Poster = forwardRef((props, ref) => {
 
               <div>
                 <strong>Consignor :</strong> <span style={{ fontWeight: "normal", fontSize: "15px" }}>  {data?.vendor_name || "NA"} </span>
-                <span style={{ fontWeight: "normal", fontSize: "13px"}}> ({data?.name_hin || "NA"}) </span>
-
+                <span style={{ fontWeight: "normal", fontSize: "13px" }}>
+                  (
+                  {data?.vendor_name
+                    ? Sanscript.t(data?.vendor_name.toLowerCase(), "hk", "devanagari")
+                    : "NA"}
+                  )
+                </span>
               </div>
-             
+
               <div>
                 <strong>Address :</strong> <span style={{ fontWeight: "normal", fontSize: "15px" }}>{data?.address || "NA"} </span>
-                <span style={{ fontWeight: "normal", fontSize: "13px"}}> ({data?.Place_hin || "NA"}) </span>
+                <span style={{ fontWeaddressight: "normal", fontSize: "13px" }}>
+                  (
+                  {data?.address
+                    ? Sanscript.t(data?.address.toLowerCase(), "hk", "devanagari")
+                    : "NA"}
+                  )
+
+                </span>
 
               </div>
 
@@ -274,20 +284,37 @@ const Poster = forwardRef((props, ref) => {
                 <strong> </strong>
               </div>
               <div>
-                <strong>Consignee :</strong> <span style={{ fontWeight: "normal", fontSize: "15px" }}>{data?.supplier_name || "NA"} </span>
-                <span style={{ fontWeight: "normal", fontSize: "13px"}}> ({data?.consignee_hindi || "NA"}) </span>
-
+                <strong>Consignee :</strong>{" "}
+                <span style={{ fontWeight: "normal", fontSize: "15px" }}>
+                  {data?.supplier_name || "NA"}
+                </span>
+                <span style={{ fontWeight: "normal", fontSize: "13px", marginLeft: "5px" }}>
+                  (
+                  {data?.supplier_name
+                    ? Sanscript.t(data?.supplier_name.toLowerCase(), "hk", "devanagari")
+                    : "NA"}
+                  )
+                </span>
               </div>
-
 
               <div>
                 <strong>Place :</strong> <span style={{ fontWeight: "normal", fontSize: "15px" }}> {data?.ship_to_address1 || "NA"}  </span>
-                <span style={{ fontWeight: "normal", fontSize: "13px"}}> ({data?.place_hindi || "NA"}) </span>
-
+                <span style={{ fontWeight: "normal", fontSize: "13px" }}>
+                  (
+                  {data?.ship_to_address1
+                    ? Sanscript.t(data?.ship_to_address1.toLowerCase(), "hk", "devanagari")
+                    : "NA"}
+                  )
+                </span>
               </div>
               <div>
                 <strong>District :</strong> <span style={{ fontWeight: "normal", fontSize: "15px" }}>{data?.ship_to_district || "NA"} </span>
-                <span style={{ fontWeight: "normal", fontSize: "13px"}}> ({data?.district_hindi || "NA"}) </span>
+                <span style={{ fontWeight: "normal", fontSize: "13px" }}>
+                  (
+                  {data?.ship_to_district
+                    ? Sanscript.t(data?.ship_to_district, "itrans", "devanagari")
+                    : "NA"}                    )
+                </span>
 
               </div>
               <div>

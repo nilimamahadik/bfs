@@ -15,6 +15,7 @@
     "@mui/x-charts": "^6.18.3",
     "@mui/x-data-grid": "^6.18.3",
     "@mui/x-data-grid-generator": "^6.18.3",
+    "@sanskrit-coders/sanscript": "^1.2.8",
     "@syncfusion/ej2-react-popups": "^23.2.4",
     "antd": "^5.6.3",
     "aws-amplify": "^5.3.1",

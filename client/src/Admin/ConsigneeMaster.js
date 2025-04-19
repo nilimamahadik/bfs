@@ -22,6 +22,7 @@ import { DataTable } from "../commonfunction/Datatable";
 import { getIndianTimestamp } from "../commonfunction/formatDate";
 import { MdArrowBack } from "react-icons/md";
 import { transliterate } from "transliteration";
+import Sanscript from "@sanskrit-coders/sanscript";
 
 const BASEURL = "/api"
 
@@ -73,78 +74,33 @@ const ConsigneeMaster = () => {
     };
 
     const handleClose = () => setOpen(false);
-    // Add Consignee
-    // const addConsignee = () => {
-    //     form.validateFields().then(async (values) => {
-    //         // // console.log("values", values);
-    //         // // console.log("User ID:", value.id);
-    //         const payload = { ...values, groupId };
-    //         try {
-    //             const response = await axios.post(`${BASEURL}/consigneemaster`, payload);
-    //             // setConsignees([...products, response.data.product]); // Update UI
-    //             fetchConsignees();
-    //             message.success({
-    //                 content: response.data.message,
-    //                 duration: 2, // Time before it disappears (in seconds)
-    //                 style: {
-    //                     marginTop: "25vh", // Moves it to center vertically
-    //                     textAlign: "center", // Ensures text is centered
-    //                     // Moves it to center horizontally
-    //                 }
-    //             });
-    //             handleClose();
-    //         } catch (error) {
-    //             // // console.error("Error adding product:", error);
-    //             alert("Failed to add product!");
-    //         }
-    //     });
-    // };
+    
     const addConsignee = () => {
         form.validateFields().then(async (values) => {
-            // Transliterate to Hindi and Marathi
-            const name_hi = transliterate(values.name, { lang: "hi" });
-            console.log(name_hi);
-            
-            const name_mr = transliterate(values.name, { lang: "mr" });
-
-            const place_hi = transliterate(values.place, { lang: "hi" });
-            const place_mr = transliterate(values.place, { lang: "mr" });
-
-            const district_hi = transliterate(values.district, { lang: "hi" });
-            const district_mr = transliterate(values.district, { lang: "mr" });
-
-            // Build the final payload
-            const payload = {
-                ...values,
-                groupId,
-                name_hi,
-                name_mr,
-                place_hi,
-                place_mr,
-                district_hi,
-                district_mr,
-            };
-            console.log(payload);
-            return
-
+            // // console.log("values", values);
+            // // console.log("User ID:", value.id);
+            const payload = { ...values, groupId };
             try {
                 const response = await axios.post(`${BASEURL}/consigneemaster`, payload);
-
+                // setConsignees([...products, response.data.product]); // Update UI
                 fetchConsignees();
                 message.success({
                     content: response.data.message,
-                    duration: 2,
+                    duration: 2, // Time before it disappears (in seconds)
                     style: {
-                        marginTop: "25vh",
-                        textAlign: "center",
-                    },
+                        marginTop: "25vh", // Moves it to center vertically
+                        textAlign: "center", // Ensures text is centered
+                        // Moves it to center horizontally
+                    }
                 });
                 handleClose();
             } catch (error) {
-                alert("Failed to add consignee!");
+                // // console.error("Error adding product:", error);
+                alert("Failed to add product!");
             }
         });
     };
+ 
 
 
     const fetchConsignees = async () => {
@@ -262,7 +218,12 @@ const ConsigneeMaster = () => {
             header: false,
         });
     };
+    const handleNameChange = (e) => {
+        const englishText = e.target.value;
+        const hindiText = Sanscript.t(englishText, "itrans", "devanagari");
 
+        form.setFieldsValue({ name: hindiText }); // Replace input with Hindi
+    };
     // Table Columns
     const columns = [
         { field: "id", headerName: "Sr. No.", minWidth: 30, flex: 0.2 },
@@ -415,20 +376,19 @@ const ConsigneeMaster = () => {
             >
                 <hr />
                 <Form form={form} layout="vertical">
-                    <Form.Item
-                        label="Name of Consignee"
-                        name="name"
-                        rules={[{ required: true, message: "Please enter Name of Consignee" }]}
-                    >
-                        <Input placeholder="Enter Name of Consignee" />
+
+                    <Form.Item name="name_en" label="Name in English">
+                        <Input onChange={(e) => {
+                            const english = e.target.value;
+                            form.setFieldsValue({ name_hi: Sanscript.t(english, "itrans", "devanagari") });
+                        }} />
                     </Form.Item>
-                    {/* <Form.Item
-                        label="Name of Consignee in Hindi"
-                        name="consignee_hindi"
-                        rules={[{ required: true, message: "Please enter Name of Consignee in Hindi " }]}
-                    >
-                        <Input placeholder="Enter Name of Consignee in Hindi" />
-                    </Form.Item> */}
+
+                    <Form.Item name="name_hi" label="Name in Hindi">
+                        <Input />
+                    </Form.Item>
+
+                  
                     <Form.Item
                         label="Place"
                         name="place"
@@ -436,13 +396,7 @@ const ConsigneeMaster = () => {
                     >
                         <Input placeholder="Enter place " />
                     </Form.Item>
-                    {/* <Form.Item
-                        label="Place in Hindi"
-                        name="place_hindi"
-                        rules={[{ required: true, message: "Please enter place in Hindi " }]}
-                    >
-                        <Input placeholder="Enter place in Hindi " />
-                    </Form.Item> */}
+                    
                     <Form.Item
                         label="District"
                         name="district"
@@ -450,13 +404,7 @@ const ConsigneeMaster = () => {
                     >
                         <Input placeholder="Enter District" />
                     </Form.Item>
-                    {/* <Form.Item
-                        label="District in Hindi "
-                        name="district_hindi"
-                        rules={[{ required: true, message: "Please enter District in Hindi " }]}
-                    >
-                        <Input placeholder="Enter District in Hindi" />
-                    </Form.Item> */}
+                   
                     <Form.Item
                         label="Mobile Number"
                         name="mobileNo"
